@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Plus, Wand2, Download, Image as ImageIcon, Trash2, Copy, MoreVertical, Expand, LayoutTemplate, Type, ImageIcon as ImageIconAlt, Grid3X3, Rows3, Send, X } from "lucide-react";
+import { Plus, Wand2, Download, Image as ImageIcon, Trash2, Copy, MoreVertical, Expand, LayoutTemplate, Type, ImageIcon as ImageIconAlt, Grid3X3, Rows3, Send, X, Upload, Palette, Clock, ChevronUp, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   DropdownMenu,
@@ -73,13 +73,19 @@ export default function Home() {
   ]);
 
   const [selectedPage, setSelectedPage] = useState<number>(1);
-  const [availableImages] = useState<string[]>([
+  const [availableImages, setAvailableImages] = useState<string[]>([
     "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=225&fit=crop",
     "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=225&fit=crop",
     "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=400&h=225&fit=crop",
     "https://images.unsplash.com/photo-1464822759844-d150ad6d1dde?w=400&h=225&fit=crop",
     "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=225&fit=crop"
   ]);
+  const [showImageTray, setShowImageTray] = useState<boolean>(false);
+  const [currentPageForImage, setCurrentPageForImage] = useState<number | null>(null);
+  const [imageTrayTab, setImageTrayTab] = useState<'recent' | 'upload' | 'ai'>('recent');
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [aiImagePrompt, setAiImagePrompt] = useState<string>('');
+  const [isGeneratingImage, setIsGeneratingImage] = useState<boolean>(false);
   const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const [gridLayout, setGridLayout] = useState<'single' | 'double'>('double');
@@ -181,6 +187,65 @@ export default function Home() {
     });
   };
 
+  // Open image tray for specific page
+  const openImageTray = (pageId: number) => {
+    setCurrentPageForImage(pageId);
+    setShowImageTray(true);
+  };
+
+  // Close image tray
+  const closeImageTray = () => {
+    setShowImageTray(false);
+    setCurrentPageForImage(null);
+    setAiImagePrompt('');
+  };
+
+  // Handle file upload
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        setUploadedImages(prev => [...prev, imageUrl]);
+        setAvailableImages(prev => [...prev, imageUrl]);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Generate AI image
+  const generateAIImage = async () => {
+    if (!aiImagePrompt.trim()) return;
+
+    setIsGeneratingImage(true);
+
+    // Simulate AI image generation
+    setTimeout(() => {
+      // In real implementation, this would call an AI image service
+      const generatedImageUrl = `https://images.unsplash.com/photo-${Date.now()}?w=400&h=225&fit=crop&q=80`;
+
+      setAvailableImages(prev => [generatedImageUrl, ...prev]);
+      setAiImagePrompt('');
+      setIsGeneratingImage(false);
+
+      // Auto-add to current page if one is selected
+      if (currentPageForImage) {
+        addImageToPage(currentPageForImage, generatedImageUrl);
+      }
+    }, 3000);
+  };
+
+  // Add image from tray to page
+  const addImageFromTray = (imageUrl: string) => {
+    if (currentPageForImage) {
+      addImageToPage(currentPageForImage, imageUrl);
+      closeImageTray();
+    }
+  };
+
   const addPage = () => {
     const newPage: ContentPage = {
       id: Math.max(...pages.map(p => p.id), 0) + 1,
@@ -192,7 +257,11 @@ export default function Home() {
       promptText: ''
     };
     setPages([...pages, newPage]);
-    setSelectedPage(newPage.id);
+
+    // Auto-scroll to the new page after a brief delay to ensure DOM update
+    setTimeout(() => {
+      scrollToPage(newPage.id);
+    }, 100);
   };
 
   const updatePage = (id: number, updates: Partial<ContentPage>) => {
@@ -485,6 +554,20 @@ export default function Home() {
                                     Duplicate
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
+                                    onClick={() => movePage(page.id, 'up')}
+                                    disabled={index === 0}
+                                  >
+                                    <ChevronUp className="w-4 h-4 mr-2" />
+                                    Move Up
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    onClick={() => movePage(page.id, 'down')}
+                                    disabled={index === pages.length - 1}
+                                  >
+                                    <ChevronDown className="w-4 h-4 mr-2" />
+                                    Move Down
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
                                     onClick={() => deletePage(page.id)}
                                     disabled={pages.length <= 1}
                                     className="text-red-600"
@@ -550,41 +633,18 @@ export default function Home() {
                           <div className="mt-4">
                             <div className="flex items-center justify-between mb-3">
                               <h4 className="text-sm font-medium">Page Images ({page.images.length})</h4>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-6 px-2 text-xs"
-                                    onClick={(e) => e.stopPropagation()}
-                                  >
-                                    <Plus className="w-3 h-3 mr-1" />
-                                    Add Image
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-80">
-                                  <div className="p-2">
-                                    <div className="grid grid-cols-2 gap-2">
-                                      {availableImages.map((imageUrl, imgIndex) => (
-                                        <div
-                                          key={imgIndex}
-                                          className="relative cursor-pointer group"
-                                          onClick={() => addImageToPage(page.id, imageUrl)}
-                                        >
-                                          <img
-                                            src={imageUrl}
-                                            alt={`Available ${imgIndex + 1}`}
-                                            className="w-full h-16 object-cover rounded border border-border group-hover:border-primary"
-                                          />
-                                          {page.images.includes(imageUrl) && (
-                                            <div className="absolute inset-0 bg-green-500/20 border-2 border-green-500 rounded" />
-                                          )}
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="h-6 px-2 text-xs"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openImageTray(page.id);
+                                }}
+                              >
+                                <Plus className="w-3 h-3 mr-1" />
+                                Add Image
+                              </Button>
                             </div>
 
                             {page.images.length > 0 && (
@@ -776,6 +836,196 @@ export default function Home() {
             ))}
           </div>
         </motion.div>
+
+        {/* Image Management Tray */}
+        <AnimatePresence>
+          {showImageTray && (
+            <>
+              {/* Overlay */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/50 z-40"
+                onClick={closeImageTray}
+              />
+
+              {/* Slide-out Tray */}
+              <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                className="fixed right-0 top-0 h-full w-96 bg-background border-l border-border z-50 flex flex-col shadow-2xl"
+              >
+                {/* Header */}
+                <div className="p-6 border-b border-border">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold">Image Library</h2>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={closeImageTray}
+                      className="h-8 w-8 p-0"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  {/* Tabs */}
+                  <div className="flex space-x-1 bg-muted p-1 rounded-lg">
+                    <button
+                      onClick={() => setImageTrayTab('recent')}
+                      className={`flex-1 flex items-center justify-center px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+                        imageTrayTab === 'recent'
+                          ? 'bg-background text-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <Clock className="w-3 h-3 mr-1" />
+                      Recent
+                    </button>
+                    <button
+                      onClick={() => setImageTrayTab('upload')}
+                      className={`flex-1 flex items-center justify-center px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+                        imageTrayTab === 'upload'
+                          ? 'bg-background text-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <Upload className="w-3 h-3 mr-1" />
+                      Upload
+                    </button>
+                    <button
+                      onClick={() => setImageTrayTab('ai')}
+                      className={`flex-1 flex items-center justify-center px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+                        imageTrayTab === 'ai'
+                          ? 'bg-background text-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <Palette className="w-3 h-3 mr-1" />
+                      AI Generate
+                    </button>
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="flex-1 overflow-y-auto p-6">
+                  {imageTrayTab === 'recent' && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-3">
+                        {availableImages.map((imageUrl, index) => (
+                          <div
+                            key={index}
+                            className="relative cursor-pointer group"
+                            onClick={() => addImageFromTray(imageUrl)}
+                          >
+                            <img
+                              src={imageUrl}
+                              alt={`Library image ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg border border-border group-hover:border-primary transition-colors"
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-lg transition-colors" />
+                            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                                <Plus className="w-3 h-3 text-primary-foreground" />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {imageTrayTab === 'upload' && (
+                    <div className="space-y-4">
+                      <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+                        <Upload className="w-8 h-8 mx-auto mb-3 text-muted-foreground" />
+                        <p className="text-sm text-muted-foreground mb-3">
+                          Upload your own images
+                        </p>
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          onChange={handleFileUpload}
+                          className="hidden"
+                          id="image-upload"
+                        />
+                        <label htmlFor="image-upload">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="cursor-pointer"
+                            asChild
+                          >
+                            <span>Choose Files</span>
+                          </Button>
+                        </label>
+                      </div>
+
+                      {uploadedImages.length > 0 && (
+                        <div>
+                          <h3 className="text-sm font-medium mb-3">Uploaded Images</h3>
+                          <div className="grid grid-cols-2 gap-3">
+                            {uploadedImages.map((imageUrl, index) => (
+                              <div
+                                key={index}
+                                className="relative cursor-pointer group"
+                                onClick={() => addImageFromTray(imageUrl)}
+                              >
+                                <img
+                                  src={imageUrl}
+                                  alt={`Uploaded ${index + 1}`}
+                                  className="w-full h-24 object-cover rounded-lg border border-border group-hover:border-primary transition-colors"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-lg transition-colors" />
+                                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                                    <Plus className="w-3 h-3 text-primary-foreground" />
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {imageTrayTab === 'ai' && (
+                    <div className="space-y-4">
+                      <div className="space-y-3">
+                        <label className="text-sm font-medium">
+                          Describe the image you want to generate
+                        </label>
+                        <Textarea
+                          value={aiImagePrompt}
+                          onChange={(e) => setAiImagePrompt(e.target.value)}
+                          placeholder="A professional photo of a tropical beach with palm trees and crystal clear water..."
+                          className="min-h-[100px] resize-none"
+                        />
+                        <Button
+                          onClick={generateAIImage}
+                          disabled={!aiImagePrompt.trim() || isGeneratingImage}
+                          className="w-full bg-purple-gradient text-white border-0 hover:bg-purple-gradient"
+                        >
+                          <Palette className="w-4 h-4 mr-2" />
+                          {isGeneratingImage ? 'Generating Image...' : 'Generate Image'}
+                        </Button>
+                      </div>
+
+                      <div className="text-xs text-muted-foreground">
+                        💡 Tip: Be specific about style, colors, composition, and mood for better results.
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
