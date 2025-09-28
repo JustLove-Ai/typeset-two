@@ -328,7 +328,18 @@ export default function Home() {
 
     const newPages = [...pages];
     [newPages[currentIndex], newPages[newIndex]] = [newPages[newIndex], newPages[currentIndex]];
-    setPages(newPages);
+
+    // Renumber pages based on their new order
+    const renumberedPages = newPages.map((page, index) => ({
+      ...page,
+      id: index + 1
+    }));
+
+    setPages(renumberedPages);
+
+    // Update selected page to maintain selection after renumbering
+    const movedPage = renumberedPages[newIndex];
+    setSelectedPage(movedPage.id);
   };
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
