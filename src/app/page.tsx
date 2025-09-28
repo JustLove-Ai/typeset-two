@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Plus, Wand2, Download, Image as ImageIcon, Trash2, Copy, MoreVertical, Expand, LayoutTemplate, Type, ImageIcon as ImageIconAlt, Grid3X3, Rows3 } from "lucide-react";
+import { Plus, Wand2, Download, Image as ImageIcon, Trash2, Copy, MoreVertical, Expand, LayoutTemplate, Type, ImageIcon as ImageIconAlt, Grid3X3, Rows3, Send, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   DropdownMenu,
@@ -27,6 +27,8 @@ interface ContentPage {
   template: TemplateType;
   subtitle?: string;
   isGenerating?: boolean;
+  showPrompt?: boolean;
+  promptText?: string;
 }
 
 export default function Home() {
@@ -37,28 +39,36 @@ export default function Home() {
       content: "Discover the best family-friendly vacation spots that offer unforgettable experiences for all ages.",
       template: 'title' as TemplateType,
       subtitle: "A Complete Guide to Family Travel",
-      images: []
+      images: [],
+      showPrompt: false,
+      promptText: ''
     },
     {
       id: 2,
       title: "Florida, USA: The #1 Vacation Destination",
       content: "Families love to travel to Florida because of its spectacular beaches and attractions. From the beautiful Gulf Coast to the world-famous theme parks, Florida has something for everyone. The year-round sunshine and warm temperatures make it the perfect destination for a family vacation. With its many beaches, theme parks, and attractions, Florida is a great place for families to explore and create lasting memories.",
       template: 'text-image-right' as TemplateType,
-      images: ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop"]
+      images: ["https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop"],
+      showPrompt: false,
+      promptText: ''
     },
     {
       id: 3,
       title: "Our Top Vacation Resources",
       content: "Access our curated collection of travel guides, booking tools, and insider tips to make your family vacation planning effortless.",
       template: 'text-only' as TemplateType,
-      images: []
+      images: [],
+      showPrompt: false,
+      promptText: ''
     },
     {
       id: 4,
       title: "Table of Contents",
       content: "What You'll Discover Inside:\n\n1. Top Family Destinations\n2. Budget Planning Guide\n3. Travel Tips & Tricks\n4. Safety Considerations\n5. Packing Essentials",
       template: 'table-of-contents' as TemplateType,
-      images: []
+      images: [],
+      showPrompt: false,
+      promptText: ''
     }
   ]);
 
@@ -124,19 +134,51 @@ export default function Home() {
     });
   };
 
-  // Generate AI content for specific page
-  const generateAIContent = async (pageId: number) => {
-    updatePage(pageId, { isGenerating: true });
+  // Toggle prompt input for AI generation
+  const togglePromptInput = (pageId: number) => {
+    const page = pages.find(p => p.id === pageId);
+    if (!page) return;
+
+    updatePage(pageId, {
+      showPrompt: !page.showPrompt,
+      promptText: page.promptText || ''
+    });
+  };
+
+  // Generate AI content with user prompt
+  const generateAIContent = async (pageId: number, prompt: string) => {
+    updatePage(pageId, {
+      isGenerating: true,
+      showPrompt: false
+    });
 
     // Simulate AI generation delay
     setTimeout(() => {
-      const aiContent = `AI-generated content for ${pages.find(p => p.id === pageId)?.title}. This paragraph provides comprehensive information about the topic, offering valuable insights and detailed explanations that engage readers while maintaining professional quality and relevance to the subject matter.`;
+      const aiContent = `AI-generated content based on "${prompt}": This comprehensive section explores the topic in detail, providing valuable insights and engaging information that aligns with the user's specific requirements. The content maintains professional quality while addressing the key points outlined in the prompt.`;
 
       updatePage(pageId, {
         content: aiContent,
-        isGenerating: false
+        isGenerating: false,
+        showPrompt: false, // Ensure we show the textarea with generated content
+        promptText: ''
       });
     }, 2000);
+  };
+
+  // Handle prompt submission
+  const handlePromptSubmit = (pageId: number) => {
+    const page = pages.find(p => p.id === pageId);
+    if (!page || !page.promptText?.trim()) return;
+
+    generateAIContent(pageId, page.promptText.trim());
+  };
+
+  // Cancel prompt input
+  const cancelPrompt = (pageId: number) => {
+    updatePage(pageId, {
+      showPrompt: false,
+      promptText: ''
+    });
   };
 
   const addPage = () => {
@@ -145,7 +187,9 @@ export default function Home() {
       title: `Page ${pages.length + 1}`,
       content: "Enter your content here...",
       template: 'text-only' as TemplateType,
-      images: []
+      images: [],
+      showPrompt: false,
+      promptText: ''
     };
     setPages([...pages, newPage]);
     setSelectedPage(newPage.id);
@@ -194,7 +238,9 @@ export default function Home() {
       ...pageToDuplicate,
       id: Math.max(...pages.map(p => p.id)) + 1,
       title: `${pageToDuplicate.title} (Copy)`,
-      isGenerating: false
+      isGenerating: false,
+      showPrompt: false,
+      promptText: ''
     };
 
     const pageIndex = pages.findIndex(page => page.id === id);
@@ -389,12 +435,12 @@ export default function Home() {
                                 className="h-8 px-3 text-xs bg-purple-gradient text-white border-0 hover:bg-purple-gradient"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  generateAIContent(page.id);
+                                  togglePromptInput(page.id);
                                 }}
                                 disabled={page.isGenerating}
                               >
                                 <Wand2 className="w-3 h-3 mr-1" />
-                                {page.isGenerating ? 'Generating...' : 'AI'}
+                                {page.isGenerating ? 'Generating...' : page.showPrompt ? 'Cancel' : 'AI'}
                               </Button>
 
                               <DropdownMenu>
@@ -450,13 +496,55 @@ export default function Home() {
                               </DropdownMenu>
                             </div>
                           </div>
-                          <Textarea
-                            value={page.content}
-                            onChange={(e) => updatePage(page.id, { content: e.target.value })}
-                            placeholder="Write your page content here..."
-                            className="min-h-[100px] mt-3 bg-transparent border-0 p-0 resize-none focus-visible:ring-0"
-                            onClick={(e) => e.stopPropagation()}
-                          />
+                          {page.showPrompt ? (
+                            <div className="mt-3 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-700">
+                              <div className="mb-3">
+                                <label className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                                  What should this section be about?
+                                </label>
+                              </div>
+                              <Textarea
+                                value={page.promptText || ''}
+                                onChange={(e) => updatePage(page.id, { promptText: e.target.value })}
+                                placeholder="Describe what you want this section to cover... (e.g., 'Explain the benefits of family travel to Florida')"
+                                className="min-h-[80px] bg-white dark:bg-background border border-purple-200 dark:border-purple-600 rounded-md p-3 resize-none focus-visible:ring-purple-500"
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              <div className="flex gap-2 mt-3">
+                                <Button
+                                  size="sm"
+                                  className="bg-purple-gradient text-white border-0 hover:bg-purple-gradient"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handlePromptSubmit(page.id);
+                                  }}
+                                  disabled={!page.promptText?.trim()}
+                                >
+                                  <Send className="w-3 h-3 mr-1" />
+                                  Generate
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    cancelPrompt(page.id);
+                                  }}
+                                >
+                                  <X className="w-3 h-3 mr-1" />
+                                  Cancel
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <Textarea
+                              value={page.content}
+                              onChange={(e) => updatePage(page.id, { content: e.target.value })}
+                              placeholder="Write your page content here..."
+                              className="min-h-[100px] mt-3 bg-transparent border-0 p-0 resize-none focus-visible:ring-0"
+                              onClick={(e) => e.stopPropagation()}
+                            />
+                          )}
 
                           {/* Images Section for this page */}
                           <div className="mt-4">
