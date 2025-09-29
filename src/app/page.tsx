@@ -18,6 +18,48 @@ import {
 // Template types for different page layouts
 type TemplateType = 'title' | 'text-image-right' | 'text-image-left' | 'image-top-text' | 'text-top-image' | 'text-only' | 'table-of-contents';
 
+// Global theme interface for premium styling
+interface GlobalTheme {
+  name: string;
+  category: string;
+  description: string;
+  typography: {
+    headingFont: string;
+    bodyFont: string;
+    h1Size: string;
+    h2Size: string;
+    bodySize: string;
+  };
+  colors: {
+    primary: string;
+    secondary: string;
+    text: string;
+    background: string;
+    accent: string;
+  };
+  coverBackground: {
+    type: 'solid' | 'gradient' | 'pattern';
+    value: string;
+    gradient?: {
+      from: string;
+      to: string;
+      direction: string;
+    };
+  };
+  banners: {
+    enabled: boolean;
+    color: string;
+    opacity: number;
+  };
+  imageStyle: {
+    borderRadius: string;
+    borderWidth: string;
+    borderColor: string;
+    shadow: string;
+    bordersEnabled: boolean;
+  };
+}
+
 // Page/Content block type definition
 interface ContentPage {
   id: number;
@@ -93,8 +135,12 @@ export default function Home() {
   const [showTemplatePanel, setShowTemplatePanel] = useState<boolean>(false);
   const [selectedPageForTemplate, setSelectedPageForTemplate] = useState<number | null>(null);
   const [templateGalleryScroll, setTemplateGalleryScroll] = useState(0);
+  const [activeThemeTab, setActiveThemeTab] = useState<'themes' | 'typography' | 'colors' | 'backgrounds'>('themes');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [currentTheme, setCurrentTheme] = useState<GlobalTheme>({
-    name: 'Professional',
+    name: 'Corporate Blue',
+    category: 'Business',
+    description: 'Professional corporate design with trusted blue tones',
     typography: {
       headingFont: 'Inter',
       bodyFont: 'Inter',
@@ -109,17 +155,30 @@ export default function Home() {
       background: '#ffffff',
       accent: '#06b6d4'
     },
+    coverBackground: {
+      type: 'solid',
+      value: '#1e293b'
+    },
+    banners: {
+      enabled: false,
+      color: '#06b6d4',
+      opacity: 0.1
+    },
     imageStyle: {
       borderRadius: '8px',
       borderWidth: '0px',
       borderColor: '#e2e8f0',
-      shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+      shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+      bordersEnabled: false
     }
   });
 
   const predefinedThemes: GlobalTheme[] = [
+    // BUSINESS & CORPORATE THEMES
     {
-      name: 'Professional',
+      name: 'Corporate Blue',
+      category: 'Business',
+      description: 'Professional corporate design with trusted blue tones',
       typography: {
         headingFont: 'Inter',
         bodyFont: 'Inter',
@@ -128,63 +187,466 @@ export default function Home() {
         bodySize: '1rem'
       },
       colors: {
-        primary: '#1e293b',
+        primary: '#1e40af',
         secondary: '#64748b',
         text: '#334155',
         background: '#ffffff',
         accent: '#06b6d4'
       },
+      coverBackground: {
+        type: 'solid',
+        value: '#1e40af'
+      },
+      banners: {
+        enabled: true,
+        color: '#06b6d4',
+        opacity: 0.15
+      },
       imageStyle: {
         borderRadius: '8px',
         borderWidth: '0px',
         borderColor: '#e2e8f0',
-        shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+        shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        bordersEnabled: false
       }
     },
     {
-      name: 'Modern',
+      name: 'Executive Black',
+      category: 'Business',
+      description: 'Sophisticated executive presence with bold contrast',
       typography: {
-        headingFont: 'Poppins',
-        bodyFont: 'Open Sans',
+        headingFont: 'Playfair Display',
+        bodyFont: 'Source Sans Pro',
         h1Size: '3rem',
         h2Size: '1.75rem',
         bodySize: '1.1rem'
       },
       colors: {
-        primary: '#7c3aed',
-        secondary: '#a855f7',
-        text: '#1f2937',
-        background: '#fafbfc',
-        accent: '#f59e0b'
-      },
-      imageStyle: {
-        borderRadius: '16px',
-        borderWidth: '2px',
-        borderColor: '#e5e7eb',
-        shadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
-      }
-    },
-    {
-      name: 'Minimal',
-      typography: {
-        headingFont: 'Helvetica',
-        bodyFont: 'Helvetica',
-        h1Size: '2rem',
-        h2Size: '1.25rem',
-        bodySize: '0.95rem'
-      },
-      colors: {
         primary: '#000000',
-        secondary: '#6b7280',
-        text: '#374151',
+        secondary: '#404040',
+        text: '#2d3748',
         background: '#ffffff',
-        accent: '#ef4444'
+        accent: '#ffd700'
+      },
+      coverBackground: {
+        type: 'solid',
+        value: '#1a1a1a'
       },
       imageStyle: {
         borderRadius: '4px',
         borderWidth: '1px',
-        borderColor: '#d1d5db',
-        shadow: 'none'
+        borderColor: '#e5e7eb',
+        shadow: '0 8px 25px -5px rgba(0, 0, 0, 0.1)'
+      }
+    },
+    {
+      name: 'Finance Gold',
+      category: 'Business',
+      description: 'Premium financial services with gold accents',
+      typography: {
+        headingFont: 'Merriweather',
+        bodyFont: 'Open Sans',
+        h1Size: '2.75rem',
+        h2Size: '1.6rem',
+        bodySize: '1rem'
+      },
+      colors: {
+        primary: '#1a365d',
+        secondary: '#4a5568',
+        text: '#2d3748',
+        background: '#fefefe',
+        accent: '#d69e2e'
+      },
+      coverBackground: {
+        type: 'solid',
+        value: '#d69e2e'
+      },
+      imageStyle: {
+        borderRadius: '12px',
+        borderWidth: '2px',
+        borderColor: '#d69e2e',
+        shadow: '0 10px 15px -3px rgba(214, 158, 46, 0.1)'
+      }
+    },
+    {
+      name: 'Legal Gray',
+      category: 'Business',
+      description: 'Authoritative legal professional styling',
+      typography: {
+        headingFont: 'Georgia',
+        bodyFont: 'Times New Roman',
+        h1Size: '2.5rem',
+        h2Size: '1.5rem',
+        bodySize: '1rem'
+      },
+      colors: {
+        primary: '#2d3748',
+        secondary: '#4a5568',
+        text: '#1a202c',
+        background: '#ffffff',
+        accent: '#718096'
+      },
+      coverBackground: {
+        type: 'gradient',
+        value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        gradient: { from: '#667eea', to: '#764ba2', direction: '135deg' }
+      },
+      imageStyle: {
+        borderRadius: '6px',
+        borderWidth: '1px',
+        borderColor: '#cbd5e0',
+        shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        bordersEnabled: false
+      },
+      banners: {
+        enabled: false,
+        color: '#ffd700',
+        opacity: 0.1
+      }
+    },
+
+    // CREATIVE & DESIGN THEMES
+    {
+      name: 'Creative Vibrant',
+      category: 'Creative',
+      description: 'Bold creative expression with vivid colors',
+      typography: {
+        headingFont: 'Montserrat',
+        bodyFont: 'Lato',
+        h1Size: '3.5rem',
+        h2Size: '2rem',
+        bodySize: '1.1rem'
+      },
+      colors: {
+        primary: '#e53e3e',
+        secondary: '#dd6b20',
+        text: '#2d3748',
+        background: '#fefefe',
+        accent: '#9f7aea'
+      },
+      coverBackground: {
+        type: 'gradient',
+        value: 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%)',
+        gradient: { from: '#ff9a9e', to: '#fecfef', direction: '135deg' }
+      },
+      imageStyle: {
+        borderRadius: '20px',
+        borderWidth: '3px',
+        borderColor: '#e53e3e',
+        shadow: '0 20px 25px -5px rgba(229, 62, 62, 0.1)'
+      }
+    },
+    {
+      name: 'Artist Palette',
+      category: 'Creative',
+      description: 'Artistic freedom with painter-inspired colors',
+      typography: {
+        headingFont: 'Abril Fatface',
+        bodyFont: 'Nunito',
+        h1Size: '3.25rem',
+        h2Size: '1.85rem',
+        bodySize: '1.05rem'
+      },
+      colors: {
+        primary: '#4c1d95',
+        secondary: '#7c3aed',
+        text: '#374151',
+        background: '#faf5ff',
+        accent: '#f59e0b'
+      },
+      coverBackground: {
+        type: 'gradient',
+        value: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+        gradient: { from: '#a8edea', to: '#fed6e3', direction: '135deg' }
+      },
+      imageStyle: {
+        borderRadius: '25px',
+        borderWidth: '4px',
+        borderColor: '#4c1d95',
+        shadow: '0 25px 50px -12px rgba(76, 29, 149, 0.25)'
+      }
+    },
+    {
+      name: 'Designer Minimal',
+      category: 'Creative',
+      description: 'Clean design-focused minimalism',
+      typography: {
+        headingFont: 'Space Grotesk',
+        bodyFont: 'Inter',
+        h1Size: '2.75rem',
+        h2Size: '1.6rem',
+        bodySize: '1rem'
+      },
+      colors: {
+        primary: '#1f2937',
+        secondary: '#6b7280',
+        text: '#374151',
+        background: '#ffffff',
+        accent: '#10b981'
+      },
+      coverBackground: {
+        type: 'solid',
+        value: '#f8fafc'
+      },
+      imageStyle: {
+        borderRadius: '2px',
+        borderWidth: '0px',
+        borderColor: 'transparent',
+        shadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+      }
+    },
+
+    // EDITORIAL & PUBLISHING
+    {
+      name: 'Magazine Clean',
+      category: 'Editorial',
+      description: 'Modern magazine layout with crisp typography',
+      typography: {
+        headingFont: 'Oswald',
+        bodyFont: 'Source Sans Pro',
+        h1Size: '3rem',
+        h2Size: '1.75rem',
+        bodySize: '1.05rem'
+      },
+      colors: {
+        primary: '#1a202c',
+        secondary: '#4a5568',
+        text: '#2d3748',
+        background: '#ffffff',
+        accent: '#ed8936'
+      },
+      coverBackground: {
+        type: 'gradient',
+        value: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+        gradient: { from: '#ffecd2', to: '#fcb69f', direction: '135deg' }
+      },
+      imageStyle: {
+        borderRadius: '8px',
+        borderWidth: '0px',
+        borderColor: 'transparent',
+        shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+        bordersEnabled: false
+      },
+      banners: {
+        enabled: false,
+        color: '#ffd700',
+        opacity: 0.1
+      }
+    },
+    {
+      name: 'Journal Elegant',
+      category: 'Editorial',
+      description: 'Sophisticated journal styling for thoughtful content',
+      typography: {
+        headingFont: 'Playfair Display',
+        bodyFont: 'Crimson Text',
+        h1Size: '2.5rem',
+        h2Size: '1.5rem',
+        bodySize: '1.1rem'
+      },
+      colors: {
+        primary: '#553c9a',
+        secondary: '#805ad5',
+        text: '#2d3748',
+        background: '#fffffe',
+        accent: '#d69e2e'
+      },
+      coverBackground: {
+        type: 'gradient',
+        value: 'linear-gradient(135deg, #e0c3fc 0%, #9bb5ff 100%)',
+        gradient: { from: '#e0c3fc', to: '#9bb5ff', direction: '135deg' }
+      },
+      imageStyle: {
+        borderRadius: '10px',
+        borderWidth: '1px',
+        borderColor: '#e2e8f0',
+        shadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+      }
+    },
+
+    // LUXURY & PREMIUM
+    {
+      name: 'Luxury Rose Gold',
+      category: 'Luxury',
+      description: 'Opulent rose gold luxury experience',
+      typography: {
+        headingFont: 'Cormorant Garamond',
+        bodyFont: 'Libre Baskerville',
+        h1Size: '3.5rem',
+        h2Size: '2rem',
+        bodySize: '1.1rem'
+      },
+      colors: {
+        primary: '#744c2c',
+        secondary: '#9c6644',
+        text: '#2d3748',
+        background: '#fffbf7',
+        accent: '#e6a85c'
+      },
+      coverBackground: {
+        type: 'gradient',
+        value: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
+        gradient: { from: '#ffecd2', to: '#fcb69f', direction: '135deg' }
+      },
+      imageStyle: {
+        borderRadius: '15px',
+        borderWidth: '2px',
+        borderColor: '#e6a85c',
+        shadow: '0 20px 25px -5px rgba(230, 168, 92, 0.1)'
+      }
+    },
+    {
+      name: 'Premium Platinum',
+      category: 'Luxury',
+      description: 'Platinum-tier sophistication and elegance',
+      typography: {
+        headingFont: 'Didot',
+        bodyFont: 'Avenir',
+        h1Size: '3rem',
+        h2Size: '1.75rem',
+        bodySize: '1rem'
+      },
+      colors: {
+        primary: '#2d3748',
+        secondary: '#4a5568',
+        text: '#1a202c',
+        background: '#ffffff',
+        accent: '#805ad5'
+      },
+      coverBackground: {
+        type: 'gradient',
+        value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        gradient: { from: '#667eea', to: '#764ba2', direction: '135deg' }
+      },
+      imageStyle: {
+        borderRadius: '12px',
+        borderWidth: '1px',
+        borderColor: '#cbd5e0',
+        shadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+      }
+    },
+
+    // TECHNOLOGY & MODERN
+    {
+      name: 'Tech Gradient',
+      category: 'Technology',
+      description: 'Futuristic tech aesthetic with bold gradients',
+      typography: {
+        headingFont: 'JetBrains Mono',
+        bodyFont: 'Inter',
+        h1Size: '2.75rem',
+        h2Size: '1.6rem',
+        bodySize: '1rem'
+      },
+      colors: {
+        primary: '#1e40af',
+        secondary: '#3b82f6',
+        text: '#1f2937',
+        background: '#f8fafc',
+        accent: '#06b6d4'
+      },
+      coverBackground: {
+        type: 'gradient',
+        value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        gradient: { from: '#667eea', to: '#764ba2', direction: '135deg' }
+      },
+      imageStyle: {
+        borderRadius: '16px',
+        borderWidth: '0px',
+        borderColor: 'transparent',
+        shadow: '0 20px 25px -5px rgba(59, 130, 246, 0.1)'
+      }
+    },
+    {
+      name: 'Startup Dynamic',
+      category: 'Technology',
+      description: 'High-energy startup vibe with bold colors',
+      typography: {
+        headingFont: 'Poppins',
+        bodyFont: 'Inter',
+        h1Size: '3.25rem',
+        h2Size: '1.85rem',
+        bodySize: '1.05rem'
+      },
+      colors: {
+        primary: '#7c3aed',
+        secondary: '#a855f7',
+        text: '#374151',
+        background: '#ffffff',
+        accent: '#f59e0b'
+      },
+      coverBackground: {
+        type: 'gradient',
+        value: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        gradient: { from: '#667eea', to: '#764ba2', direction: '135deg' }
+      },
+      imageStyle: {
+        borderRadius: '20px',
+        borderWidth: '0px',
+        borderColor: 'transparent',
+        shadow: '0 25px 50px -12px rgba(124, 58, 237, 0.25)'
+      }
+    },
+
+    // EDUCATION & HEALTHCARE
+    {
+      name: 'Education Friendly',
+      category: 'Education',
+      description: 'Approachable educational design with warm tones',
+      typography: {
+        headingFont: 'Quicksand',
+        bodyFont: 'Open Sans',
+        h1Size: '2.5rem',
+        h2Size: '1.5rem',
+        bodySize: '1.05rem'
+      },
+      colors: {
+        primary: '#2b6cb0',
+        secondary: '#4299e1',
+        text: '#2d3748',
+        background: '#ffffff',
+        accent: '#ed8936'
+      },
+      coverBackground: {
+        type: 'gradient',
+        value: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+        gradient: { from: '#a8edea', to: '#fed6e3', direction: '135deg' }
+      },
+      imageStyle: {
+        borderRadius: '12px',
+        borderWidth: '2px',
+        borderColor: '#4299e1',
+        shadow: '0 10px 15px -3px rgba(66, 153, 225, 0.1)'
+      }
+    },
+    {
+      name: 'Healthcare Clean',
+      category: 'Healthcare',
+      description: 'Clean medical professional aesthetic',
+      typography: {
+        headingFont: 'Source Sans Pro',
+        bodyFont: 'Lato',
+        h1Size: '2.5rem',
+        h2Size: '1.5rem',
+        bodySize: '1rem'
+      },
+      colors: {
+        primary: '#065f46',
+        secondary: '#059669',
+        text: '#374151',
+        background: '#ffffff',
+        accent: '#10b981'
+      },
+      coverBackground: {
+        type: 'gradient',
+        value: 'linear-gradient(135deg, #a7f3d0 0%, #6ee7b7 100%)',
+        gradient: { from: '#a7f3d0', to: '#6ee7b7', direction: '135deg' }
+      },
+      imageStyle: {
+        borderRadius: '8px',
+        borderWidth: '1px',
+        borderColor: '#d1fae5',
+        shadow: '0 4px 6px -1px rgba(16, 185, 129, 0.1)'
       }
     }
   ];
@@ -544,6 +1006,17 @@ export default function Home() {
               Export
             </Button>
           </motion.div>
+
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button
+              variant="outline"
+              onClick={() => setShowThemeSettings(true)}
+              className="border-primary text-primary hover:bg-primary hover:text-white"
+            >
+              <Palette className="w-4 h-4 mr-2" />
+              Themes
+            </Button>
+          </motion.div>
         </div>
 
         <div className="text-right flex items-center gap-4">
@@ -571,12 +1044,22 @@ export default function Home() {
       {/* Main Content Area */}
       <div ref={containerRef} className="flex-1 flex h-full overflow-hidden">
         {/* Left Panel - Content Editor */}
-        <div ref={leftPanelRef} className="flex-1 p-6 overflow-y-auto bg-background h-full" style={{ scrollBehavior: 'smooth' }}>
-          <div className="space-y-6 max-w-4xl">
+        <motion.div
+          ref={leftPanelRef}
+          className="overflow-y-auto bg-background h-full"
+          style={{ scrollBehavior: 'smooth' }}
+          animate={{
+            width: showThemeSettings ? '120px' : 'auto',
+            opacity: showThemeSettings ? 0.3 : 1
+          }}
+          transition={{ type: "spring", damping: 30, stiffness: 300, duration: 0.4 }}
+        >
+          <div className={`${showThemeSettings ? 'p-2' : 'p-6'} space-y-6 max-w-4xl transition-all duration-300`}>
 
             {/* Pages Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Pages</h3>
+              {!showThemeSettings && <h3 className="text-lg font-semibold">Pages</h3>}
+              {showThemeSettings && <h3 className="text-xs font-semibold text-center">Pages</h3>}
               <AnimatePresence>
                 {pages.map((page, index) => (
                   <motion.div
@@ -590,16 +1073,25 @@ export default function Home() {
                   >
                     <Card
                       data-page-id={page.id}
-                      className={`page-card p-6 cursor-pointer ${
+                      className={`page-card ${showThemeSettings ? 'p-2' : 'p-6'} cursor-pointer ${
                         selectedPage === page.id ? "selected" : ""
-                      }`}
+                      } transition-all duration-300`}
                       onClick={() => scrollToPage(page.id)}
                     >
-                      <div className="flex items-start gap-4">
-                        <div className="page-number">
-                          {page.id}
+                      {showThemeSettings ? (
+                        // Collapsed view - just page number
+                        <div className="flex flex-col items-center">
+                          <div className="page-number text-xs w-6 h-6 flex items-center justify-center">
+                            {page.id}
+                          </div>
                         </div>
-                        <div className="flex-1">
+                      ) : (
+                        // Full view
+                        <div className="flex items-start gap-4">
+                          <div className="page-number">
+                            {page.id}
+                          </div>
+                          <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
                             <Input
                               value={page.title}
@@ -783,13 +1275,14 @@ export default function Home() {
                           </div>
                         </div>
                       </div>
+                      )}
                     </Card>
                   </motion.div>
                 ))}
               </AnimatePresence>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Resize Handle */}
         <div
@@ -807,9 +1300,12 @@ export default function Home() {
         <motion.div
           ref={rightPanelRef}
           className="border-r border-border p-6 overflow-y-auto bg-background flex-shrink-0 h-full"
-          style={{ width: rightPanelWidth, scrollBehavior: 'smooth' }}
-          animate={{ width: rightPanelWidth }}
-          transition={{ type: "spring", damping: 20, stiffness: 100 }}
+          style={{ scrollBehavior: 'smooth' }}
+          animate={{
+            width: showThemeSettings ? 'calc(100vw - 120px - 480px - 4px)' : rightPanelWidth,
+            opacity: showThemeSettings ? 1 : 1
+          }}
+          transition={{ type: "spring", damping: 30, stiffness: 300, duration: 0.4 }}
         >
           <div className={`${gridLayout === 'double' ? 'grid grid-cols-2 gap-4' : 'space-y-4'}`}>
             {pages.map((page) => (
@@ -836,38 +1332,42 @@ export default function Home() {
                 <div
                   className={`preview-container text-black ${gridLayout === 'double' ? 'p-6 pt-10' : 'p-8 pt-12'} rounded-lg shadow-lg aspect-[3/4] relative overflow-hidden`}
                   style={{
-                    backgroundColor: currentTheme.colors.background,
-                    fontFamily: currentTheme.typography.bodyFont
+                    background: page.template === 'title' ? currentTheme.coverBackground.value : currentTheme.colors.background,
+                    fontFamily: currentTheme.typography.bodyFont,
+                    color: page.template === 'title' ? '#ffffff' : 'inherit'
                   }}
                 >
                   {page.template === 'title' && (
                     <div className="h-full flex flex-col justify-center items-center text-center px-4">
                       <h1
-                        className={`${gridLayout === 'double' ? 'text-lg' : 'text-3xl'} font-bold mb-4 leading-tight`}
+                        className={`${gridLayout === 'double' ? 'text-lg' : 'text-3xl'} font-bold mb-4 leading-tight drop-shadow-lg`}
                         style={{
                           fontSize: gridLayout === 'double' ? '1.1rem' : currentTheme.typography.h1Size,
                           fontFamily: currentTheme.typography.headingFont,
-                          color: currentTheme.colors.primary
+                          color: '#ffffff',
+                          textShadow: '0 2px 4px rgba(0,0,0,0.5)'
                         }}
                       >
                         {page.title}
                       </h1>
                       {page.subtitle && (
                         <p
-                          className={`${gridLayout === 'double' ? 'text-xs' : 'text-lg'} mb-6`}
+                          className={`${gridLayout === 'double' ? 'text-xs' : 'text-lg'} mb-6 drop-shadow-md`}
                           style={{
                             fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
-                            color: currentTheme.colors.secondary
+                            color: '#f0f0f0',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.5)'
                           }}
                         >
                           {page.subtitle}
                         </p>
                       )}
                       <div
-                        className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} max-w-md leading-relaxed`}
+                        className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} max-w-md leading-relaxed drop-shadow-md`}
                         style={{
                           fontSize: gridLayout === 'double' ? '0.7rem' : currentTheme.typography.bodySize,
-                          color: currentTheme.colors.text
+                          color: '#e0e0e0',
+                          textShadow: '0 1px 2px rgba(0,0,0,0.5)'
                         }}
                       >
                         {page.content}
@@ -878,8 +1378,26 @@ export default function Home() {
                   {page.template === 'text-image-right' && (
                     <div className={`h-full flex ${gridLayout === 'double' ? 'gap-2' : 'gap-6'} px-2`}>
                       <div className="flex-1 flex flex-col">
-                        <h2 className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-3`}>{page.title}</h2>
-                        <p className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed text-gray-700`}>{page.content}</p>
+                        <h2
+                          className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-3`}
+                          style={{
+                            fontSize: gridLayout === 'double' ? '0.875rem' : currentTheme.typography.h2Size,
+                            fontFamily: currentTheme.typography.headingFont,
+                            color: currentTheme.colors.primary
+                          }}
+                        >
+                          {page.title}
+                        </h2>
+                        <p
+                          className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed`}
+                          style={{
+                            fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
+                            fontFamily: currentTheme.typography.bodyFont,
+                            color: currentTheme.colors.text
+                          }}
+                        >
+                          {page.content}
+                        </p>
                       </div>
                       {page.images.length > 0 && (
                         <div className="w-1/2">
@@ -905,8 +1423,26 @@ export default function Home() {
                         </div>
                       )}
                       <div className="flex-1 flex flex-col">
-                        <h2 className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-3`}>{page.title}</h2>
-                        <p className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed text-gray-700`}>{page.content}</p>
+                        <h2
+                          className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-3`}
+                          style={{
+                            fontSize: gridLayout === 'double' ? '0.875rem' : currentTheme.typography.h2Size,
+                            fontFamily: currentTheme.typography.headingFont,
+                            color: currentTheme.colors.primary
+                          }}
+                        >
+                          {page.title}
+                        </h2>
+                        <p
+                          className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed`}
+                          style={{
+                            fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
+                            fontFamily: currentTheme.typography.bodyFont,
+                            color: currentTheme.colors.text
+                          }}
+                        >
+                          {page.content}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -935,15 +1471,51 @@ export default function Home() {
                           )}
                         </div>
                       )}
-                      <h2 className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-3`}>{page.title}</h2>
-                      <p className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed text-gray-700 flex-1`}>{page.content}</p>
+                      <h2
+                        className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-3`}
+                        style={{
+                          fontSize: gridLayout === 'double' ? '0.875rem' : currentTheme.typography.h2Size,
+                          fontFamily: currentTheme.typography.headingFont,
+                          color: currentTheme.colors.primary
+                        }}
+                      >
+                        {page.title}
+                      </h2>
+                      <p
+                        className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed flex-1`}
+                        style={{
+                          fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
+                          fontFamily: currentTheme.typography.bodyFont,
+                          color: currentTheme.colors.text
+                        }}
+                      >
+                        {page.content}
+                      </p>
                     </div>
                   )}
 
                   {page.template === 'text-top-image' && (
                     <div className="h-full flex flex-col px-2">
-                      <h2 className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-3`}>{page.title}</h2>
-                      <p className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed text-gray-700 mb-4`}>{page.content}</p>
+                      <h2
+                        className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-3`}
+                        style={{
+                          fontSize: gridLayout === 'double' ? '0.875rem' : currentTheme.typography.h2Size,
+                          fontFamily: currentTheme.typography.headingFont,
+                          color: currentTheme.colors.primary
+                        }}
+                      >
+                        {page.title}
+                      </h2>
+                      <p
+                        className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed mb-4`}
+                        style={{
+                          fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
+                          fontFamily: currentTheme.typography.bodyFont,
+                          color: currentTheme.colors.text
+                        }}
+                      >
+                        {page.content}
+                      </p>
                       {page.images.length > 0 && (
                         <div className="flex-1">
                           <img
@@ -958,8 +1530,24 @@ export default function Home() {
 
                   {page.template === 'text-only' && (
                     <div className="h-full flex flex-col px-4">
-                      <h2 className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-4`}>{page.title}</h2>
-                      <div className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed text-gray-700 whitespace-pre-line`}>
+                      <h2
+                        className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-4`}
+                        style={{
+                          fontSize: gridLayout === 'double' ? '0.875rem' : currentTheme.typography.h2Size,
+                          fontFamily: currentTheme.typography.headingFont,
+                          color: currentTheme.colors.primary
+                        }}
+                      >
+                        {page.title}
+                      </h2>
+                      <div
+                        className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed whitespace-pre-line`}
+                        style={{
+                          fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
+                          fontFamily: currentTheme.typography.bodyFont,
+                          color: currentTheme.colors.text
+                        }}
+                      >
                         {page.content}
                       </div>
                     </div>
@@ -967,9 +1555,31 @@ export default function Home() {
 
                   {page.template === 'table-of-contents' && (
                     <div className="h-full px-4">
-                      <h2 className={`${gridLayout === 'double' ? 'text-sm' : 'text-3xl'} font-bold mb-4 text-center`}>{page.title}</h2>
-                      <div className={`bg-cyan-50 ${gridLayout === 'double' ? 'p-2' : 'p-6'} rounded-lg`}>
-                        <div className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed text-gray-700 whitespace-pre-line`}>
+                      <h2
+                        className={`${gridLayout === 'double' ? 'text-sm' : 'text-3xl'} font-bold mb-4 text-center`}
+                        style={{
+                          fontSize: gridLayout === 'double' ? '0.875rem' : currentTheme.typography.h1Size,
+                          fontFamily: currentTheme.typography.headingFont,
+                          color: currentTheme.colors.primary
+                        }}
+                      >
+                        {page.title}
+                      </h2>
+                      <div
+                        className={`${gridLayout === 'double' ? 'p-2' : 'p-6'} rounded-lg`}
+                        style={{
+                          backgroundColor: `${currentTheme.colors.accent}20`,
+                          border: `1px solid ${currentTheme.colors.accent}40`
+                        }}
+                      >
+                        <div
+                          className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed whitespace-pre-line`}
+                          style={{
+                            fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
+                            fontFamily: currentTheme.typography.bodyFont,
+                            color: currentTheme.colors.text
+                          }}
+                        >
                           {page.content}
                         </div>
                       </div>
@@ -1177,80 +1787,148 @@ export default function Home() {
           )}
         </AnimatePresence>
 
-        {/* Global Theme Settings Modal */}
+        {/* Premium Global Themes Panel - Professional Tabbed Interface */}
         <AnimatePresence>
           {showThemeSettings && (
-            <>
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/50 z-50"
-                onClick={() => setShowThemeSettings(false)}
-              />
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            <motion.div
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: 'spring', damping: 30, stiffness: 400, duration: 0.3 }}
+                className="fixed top-0 right-0 h-full w-[480px] bg-background border-l border-border z-50 shadow-2xl overflow-hidden flex flex-col"
               >
-                <div className="bg-background border border-border rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-                  <div className="p-6 border-b border-border">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-2xl font-semibold">Global Theme Settings</h2>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setShowThemeSettings(false)}
-                        className="h-8 w-8 p-0"
-                      >
-                        <X className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="p-6 space-y-8">
-                    {/* Theme Presets */}
+                {/* Header */}
+                <div className="p-6 border-b border-border flex-shrink-0">
+                  <div className="flex items-center justify-between">
                     <div>
-                      <h3 className="text-lg font-medium mb-4">Quick Themes</h3>
-                      <div className="grid grid-cols-3 gap-4">
-                        {predefinedThemes.map((theme) => (
-                          <div
-                            key={theme.name}
-                            onClick={() => setCurrentTheme(theme)}
-                            className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                              currentTheme.name === theme.name
-                                ? 'border-primary bg-primary/5'
-                                : 'border-border hover:border-primary/50'
-                            }`}
-                          >
-                            <div className="text-center">
-                              <div className="text-sm font-medium mb-2">{theme.name}</div>
-                              <div className="flex justify-center gap-1 mb-2">
-                                <div
-                                  className="w-4 h-4 rounded-full"
-                                  style={{ backgroundColor: theme.colors.primary }}
-                                />
-                                <div
-                                  className="w-4 h-4 rounded-full"
-                                  style={{ backgroundColor: theme.colors.accent }}
-                                />
-                                <div
-                                  className="w-4 h-4 rounded-full"
-                                  style={{ backgroundColor: theme.colors.secondary }}
-                                />
+                      <h3 className="text-xl font-bold">Premium Themes</h3>
+                      <p className="text-sm text-muted-foreground">Professional styling for your ebook</p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setShowThemeSettings(false)}
+                      className="h-8 w-8 p-0"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Tabs Navigation */}
+                <div className="px-6 pt-4 border-b border-border flex-shrink-0">
+                  <div className="flex space-x-1">
+                    {[
+                      { id: 'themes' as const, label: 'Themes', icon: '🎨' },
+                      { id: 'typography' as const, label: 'Typography', icon: '📝' },
+                      { id: 'colors' as const, label: 'Colors', icon: '🌈' },
+                      { id: 'backgrounds' as const, label: 'Backgrounds', icon: '🖼️' }
+                    ].map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveThemeTab(tab.id)}
+                        className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                          activeThemeTab === tab.id
+                            ? 'bg-primary text-primary-foreground'
+                            : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+                        }`}
+                      >
+                        <span className="mr-2">{tab.icon}</span>
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tab Content */}
+                <div className="flex-1 overflow-y-auto">
+                  {/* THEMES TAB */}
+                  {activeThemeTab === 'themes' && (
+                    <div className="p-6 space-y-6">
+                      {/* Category Filter */}
+                      <div>
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {['All', 'Business', 'Creative', 'Editorial', 'Luxury', 'Technology', 'Education', 'Healthcare'].map((category) => (
+                            <button
+                              key={category}
+                              onClick={() => setSelectedCategory(category)}
+                              className={`px-3 py-1 text-xs rounded-full transition-colors ${
+                                selectedCategory === category
+                                  ? 'bg-primary text-primary-foreground'
+                                  : 'bg-muted text-muted-foreground hover:bg-primary/20'
+                              }`}
+                            >
+                              {category}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Theme Grid */}
+                      <div className="space-y-3">
+                        {predefinedThemes
+                          .filter(theme => selectedCategory === 'All' || theme.category === selectedCategory)
+                          .map((theme) => (
+                            <motion.div
+                              key={theme.name}
+                              onClick={() => setCurrentTheme(theme)}
+                              className={`p-4 border rounded-xl cursor-pointer transition-all duration-200 ${
+                                currentTheme.name === theme.name
+                                  ? 'border-primary bg-primary/10 shadow-lg'
+                                  : 'border-border hover:border-primary/50 hover:shadow-md'
+                              }`}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
+                              layout
+                            >
+                              <div className="flex items-start justify-between">
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 mb-1">
+                                    <h4 className="font-semibold text-sm">{theme.name}</h4>
+                                    <span className="px-2 py-0.5 text-xs bg-muted rounded-full">
+                                      {theme.category}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground mb-3">
+                                    {theme.description}
+                                  </p>
+                                  <div className="flex items-center gap-2">
+                                    <div className="flex gap-1">
+                                      <div
+                                        className="w-4 h-4 rounded-full border border-white shadow-sm"
+                                        style={{ backgroundColor: theme.colors.primary }}
+                                      />
+                                      <div
+                                        className="w-4 h-4 rounded-full border border-white shadow-sm"
+                                        style={{ backgroundColor: theme.colors.accent }}
+                                      />
+                                      <div
+                                        className="w-4 h-4 rounded-full border border-white shadow-sm"
+                                        style={{ backgroundColor: theme.colors.secondary }}
+                                      />
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {theme.typography.headingFont}
+                                    </div>
+                                  </div>
+                                </div>
+                                {currentTheme.name === theme.name && (
+                                  <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
+                                    <div className="w-2 h-2 bg-white rounded-full"></div>
+                                  </div>
+                                )}
                               </div>
-                              <div className="text-xs text-muted-foreground">{theme.typography.headingFont}</div>
-                            </div>
-                          </div>
-                        ))}
+                            </motion.div>
+                          ))}
                       </div>
                     </div>
+                  )}
 
-                    {/* Typography Settings */}
-                    <div>
-                      <h3 className="text-lg font-medium mb-4">Typography</h3>
-                      <div className="grid grid-cols-2 gap-6">
+                  {/* TYPOGRAPHY TAB */}
+                  {activeThemeTab === 'typography' && (
+                    <div className="p-6 space-y-6">
+                      <div>
+                        <h4 className="font-semibold mb-4">Font Settings</h4>
                         <div className="space-y-4">
                           <div>
                             <label className="text-sm font-medium">Heading Font</label>
@@ -1261,6 +1939,7 @@ export default function Home() {
                                 typography: { ...prev.typography, headingFont: e.target.value }
                               }))}
                               placeholder="Inter, Arial, sans-serif"
+                              className="mt-1"
                             />
                           </div>
                           <div>
@@ -1272,9 +1951,14 @@ export default function Home() {
                                 typography: { ...prev.typography, bodyFont: e.target.value }
                               }))}
                               placeholder="Inter, Arial, sans-serif"
+                              className="mt-1"
                             />
                           </div>
                         </div>
+                      </div>
+
+                      <div>
+                        <h4 className="font-semibold mb-4">Font Sizes</h4>
                         <div className="space-y-4">
                           <div>
                             <label className="text-sm font-medium">H1 Size</label>
@@ -1285,6 +1969,7 @@ export default function Home() {
                                 typography: { ...prev.typography, h1Size: e.target.value }
                               }))}
                               placeholder="2.5rem"
+                              className="mt-1"
                             />
                           </div>
                           <div>
@@ -1296,6 +1981,7 @@ export default function Home() {
                                 typography: { ...prev.typography, h2Size: e.target.value }
                               }))}
                               placeholder="1.5rem"
+                              className="mt-1"
                             />
                           </div>
                           <div>
@@ -1307,125 +1993,180 @@ export default function Home() {
                                 typography: { ...prev.typography, bodySize: e.target.value }
                               }))}
                               placeholder="1rem"
+                              className="mt-1"
                             />
                           </div>
                         </div>
                       </div>
                     </div>
+                  )}
 
-                    {/* Color Settings */}
-                    <div>
-                      <h3 className="text-lg font-medium mb-4">Colors</h3>
-                      <div className="grid grid-cols-3 gap-6">
-                        {Object.entries(currentTheme.colors).map(([key, value]) => (
-                          <div key={key}>
-                            <label className="text-sm font-medium capitalize">{key}</label>
-                            <div className="flex gap-2 mt-1">
-                              <Input
-                                type="color"
-                                value={value}
-                                onChange={(e) => setCurrentTheme(prev => ({
-                                  ...prev,
-                                  colors: { ...prev.colors, [key]: e.target.value }
-                                }))}
-                                className="w-12 h-8 p-0 border cursor-pointer"
-                              />
-                              <Input
-                                value={value}
-                                onChange={(e) => setCurrentTheme(prev => ({
-                                  ...prev,
-                                  colors: { ...prev.colors, [key]: e.target.value }
-                                }))}
-                                placeholder="#000000"
-                                className="flex-1"
-                              />
+                  {/* COLORS TAB */}
+                  {activeThemeTab === 'colors' && (
+                    <div className="p-6 space-y-6">
+                      <div>
+                        <h4 className="font-semibold mb-4">Color Palette</h4>
+                        <div className="space-y-4">
+                          {Object.entries(currentTheme.colors).map(([key, value]) => (
+                            <div key={key}>
+                              <label className="text-sm font-medium capitalize mb-2 block">{key.replace(/([A-Z])/g, ' $1')}</label>
+                              <div className="flex gap-3">
+                                <Input
+                                  type="color"
+                                  value={value}
+                                  onChange={(e) => setCurrentTheme(prev => ({
+                                    ...prev,
+                                    colors: { ...prev.colors, [key]: e.target.value }
+                                  }))}
+                                  className="w-12 h-10 p-1 border cursor-pointer"
+                                />
+                                <Input
+                                  value={value}
+                                  onChange={(e) => setCurrentTheme(prev => ({
+                                    ...prev,
+                                    colors: { ...prev.colors, [key]: e.target.value }
+                                  }))}
+                                  placeholder="#000000"
+                                  className="flex-1"
+                                />
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     </div>
+                  )}
 
-                    {/* Image Styling */}
-                    <div>
-                      <h3 className="text-lg font-medium mb-4">Image Styling</h3>
-                      <div className="grid grid-cols-2 gap-6">
+                  {/* BACKGROUNDS TAB */}
+                  {activeThemeTab === 'backgrounds' && (
+                    <div className="p-6 space-y-6">
+                      <div>
+                        <h4 className="font-semibold mb-4">Cover Page Background</h4>
                         <div className="space-y-4">
                           <div>
-                            <label className="text-sm font-medium">Border Radius</label>
-                            <Input
-                              value={currentTheme.imageStyle.borderRadius}
-                              onChange={(e) => setCurrentTheme(prev => ({
-                                ...prev,
-                                imageStyle: { ...prev.imageStyle, borderRadius: e.target.value }
-                              }))}
-                              placeholder="8px"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-sm font-medium">Border Width</label>
-                            <Input
-                              value={currentTheme.imageStyle.borderWidth}
-                              onChange={(e) => setCurrentTheme(prev => ({
-                                ...prev,
-                                imageStyle: { ...prev.imageStyle, borderWidth: e.target.value }
-                              }))}
-                              placeholder="0px"
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-4">
-                          <div>
-                            <label className="text-sm font-medium">Border Color</label>
-                            <div className="flex gap-2">
-                              <Input
-                                type="color"
-                                value={currentTheme.imageStyle.borderColor}
-                                onChange={(e) => setCurrentTheme(prev => ({
-                                  ...prev,
-                                  imageStyle: { ...prev.imageStyle, borderColor: e.target.value }
-                                }))}
-                                className="w-12 h-8 p-0 border cursor-pointer"
-                              />
-                              <Input
-                                value={currentTheme.imageStyle.borderColor}
-                                onChange={(e) => setCurrentTheme(prev => ({
-                                  ...prev,
-                                  imageStyle: { ...prev.imageStyle, borderColor: e.target.value }
-                                }))}
-                                placeholder="#e2e8f0"
-                                className="flex-1"
-                              />
+                            <label className="text-sm font-medium mb-2 block">Background Type</label>
+                            <div className="grid grid-cols-3 gap-2">
+                              {['solid', 'gradient', 'pattern'].map((type) => (
+                                <button
+                                  key={type}
+                                  onClick={() => setCurrentTheme(prev => ({
+                                    ...prev,
+                                    coverBackground: { ...prev.coverBackground, type: type as any }
+                                  }))}
+                                  className={`p-2 text-sm rounded border ${
+                                    currentTheme.coverBackground.type === type
+                                      ? 'border-primary bg-primary/10'
+                                      : 'border-border hover:bg-muted'
+                                  }`}
+                                >
+                                  {type.charAt(0).toUpperCase() + type.slice(1)}
+                                </button>
+                              ))}
                             </div>
                           </div>
-                          <div>
-                            <label className="text-sm font-medium">Shadow</label>
-                            <Input
-                              value={currentTheme.imageStyle.shadow}
-                              onChange={(e) => setCurrentTheme(prev => ({
-                                ...prev,
-                                imageStyle: { ...prev.imageStyle, shadow: e.target.value }
-                              }))}
-                              placeholder="0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+
+                          {currentTheme.coverBackground.type === 'gradient' && currentTheme.coverBackground.gradient && (
+                            <div className="space-y-3">
+                              <div>
+                                <label className="text-sm font-medium">From Color</label>
+                                <div className="flex gap-3 mt-1">
+                                  <Input
+                                    type="color"
+                                    value={currentTheme.coverBackground.gradient.from}
+                                    onChange={(e) => setCurrentTheme(prev => ({
+                                      ...prev,
+                                      coverBackground: {
+                                        ...prev.coverBackground,
+                                        gradient: prev.coverBackground.gradient ? {
+                                          ...prev.coverBackground.gradient,
+                                          from: e.target.value
+                                        } : { from: e.target.value, to: '#000000', direction: '135deg' },
+                                        value: `linear-gradient(${prev.coverBackground.gradient?.direction || '135deg'}, ${e.target.value} 0%, ${prev.coverBackground.gradient?.to || '#000000'} 100%)`
+                                      }
+                                    }))}
+                                    className="w-12 h-10 p-1 border cursor-pointer"
+                                  />
+                                  <Input
+                                    value={currentTheme.coverBackground.gradient.from}
+                                    onChange={(e) => setCurrentTheme(prev => ({
+                                      ...prev,
+                                      coverBackground: {
+                                        ...prev.coverBackground,
+                                        gradient: prev.coverBackground.gradient ? {
+                                          ...prev.coverBackground.gradient,
+                                          from: e.target.value
+                                        } : { from: e.target.value, to: '#000000', direction: '135deg' },
+                                        value: `linear-gradient(${prev.coverBackground.gradient?.direction || '135deg'}, ${e.target.value} 0%, ${prev.coverBackground.gradient?.to || '#000000'} 100%)`
+                                      }
+                                    }))}
+                                    className="flex-1"
+                                  />
+                                </div>
+                              </div>
+                              <div>
+                                <label className="text-sm font-medium">To Color</label>
+                                <div className="flex gap-3 mt-1">
+                                  <Input
+                                    type="color"
+                                    value={currentTheme.coverBackground.gradient.to}
+                                    onChange={(e) => setCurrentTheme(prev => ({
+                                      ...prev,
+                                      coverBackground: {
+                                        ...prev.coverBackground,
+                                        gradient: prev.coverBackground.gradient ? {
+                                          ...prev.coverBackground.gradient,
+                                          to: e.target.value
+                                        } : { from: '#000000', to: e.target.value, direction: '135deg' },
+                                        value: `linear-gradient(${prev.coverBackground.gradient?.direction || '135deg'}, ${prev.coverBackground.gradient?.from || '#000000'} 0%, ${e.target.value} 100%)`
+                                      }
+                                    }))}
+                                    className="w-12 h-10 p-1 border cursor-pointer"
+                                  />
+                                  <Input
+                                    value={currentTheme.coverBackground.gradient.to}
+                                    onChange={(e) => setCurrentTheme(prev => ({
+                                      ...prev,
+                                      coverBackground: {
+                                        ...prev.coverBackground,
+                                        gradient: prev.coverBackground.gradient ? {
+                                          ...prev.coverBackground.gradient,
+                                          to: e.target.value
+                                        } : { from: '#000000', to: e.target.value, direction: '135deg' },
+                                        value: `linear-gradient(${prev.coverBackground.gradient?.direction || '135deg'}, ${prev.coverBackground.gradient?.from || '#000000'} 0%, ${e.target.value} 100%)`
+                                      }
+                                    }))}
+                                    className="flex-1"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          <div className="mt-4">
+                            <label className="text-sm font-medium mb-2 block">Preview</label>
+                            <div
+                              className="w-full h-20 rounded-lg border"
+                              style={{
+                                background: currentTheme.coverBackground.value
+                              }}
                             />
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  )}
+                </div>
 
-                  <div className="p-6 border-t border-border">
-                    <div className="flex justify-end gap-3">
-                      <Button variant="outline" onClick={() => setShowThemeSettings(false)}>
-                        Cancel
-                      </Button>
-                      <Button onClick={() => setShowThemeSettings(false)} className="bg-purple-gradient text-white">
-                        Apply Theme
-                      </Button>
-                    </div>
-                  </div>
+                {/* Footer */}
+                <div className="p-6 border-t border-border flex-shrink-0">
+                  <Button
+                    onClick={() => setShowThemeSettings(false)}
+                    className="w-full bg-purple-gradient text-white h-12 text-base font-semibold"
+                  >
+                    ✨ Apply Premium Theme
+                  </Button>
                 </div>
               </motion.div>
-            </>
           )}
         </AnimatePresence>
 
@@ -1551,7 +2292,7 @@ export default function Home() {
                             <div
                               className="h-full p-2 text-black"
                               style={{
-                                backgroundColor: currentTheme.colors.background,
+                                background: template.value === 'title' ? currentTheme.coverBackground.value : currentTheme.colors.background,
                                 fontFamily: currentTheme.typography.bodyFont,
                                 fontSize: '0.5rem'
                               }}
