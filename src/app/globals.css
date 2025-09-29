@@ -259,3 +259,13 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+/* Template gallery scrollbar hide */
+.template-gallery-container::-webkit-scrollbar {
+  display: none;
+}
+
+.template-gallery-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

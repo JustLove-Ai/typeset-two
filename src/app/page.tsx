@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Plus, Wand2, Download, Image as ImageIcon, Trash2, Copy, MoreVertical, Expand, LayoutTemplate, Type, ImageIcon as ImageIconAlt, Grid3X3, Rows3, Send, X, Upload, Palette, Clock, ChevronUp, ChevronDown } from "lucide-react";
+import { Plus, Wand2, Download, Image as ImageIcon, Trash2, Copy, MoreVertical, Expand, LayoutTemplate, Type, ImageIcon as ImageIconAlt, Grid3X3, Rows3, Send, X, Upload, Palette, Clock, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   DropdownMenu,
@@ -89,6 +89,105 @@ export default function Home() {
   const [rightPanelWidth, setRightPanelWidth] = useState<number>(0);
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const [gridLayout, setGridLayout] = useState<'single' | 'double'>('double');
+  const [showThemeSettings, setShowThemeSettings] = useState<boolean>(false);
+  const [showTemplatePanel, setShowTemplatePanel] = useState<boolean>(false);
+  const [selectedPageForTemplate, setSelectedPageForTemplate] = useState<number | null>(null);
+  const [templateGalleryScroll, setTemplateGalleryScroll] = useState(0);
+  const [currentTheme, setCurrentTheme] = useState<GlobalTheme>({
+    name: 'Professional',
+    typography: {
+      headingFont: 'Inter',
+      bodyFont: 'Inter',
+      h1Size: '2.5rem',
+      h2Size: '1.5rem',
+      bodySize: '1rem'
+    },
+    colors: {
+      primary: '#1e293b',
+      secondary: '#64748b',
+      text: '#334155',
+      background: '#ffffff',
+      accent: '#06b6d4'
+    },
+    imageStyle: {
+      borderRadius: '8px',
+      borderWidth: '0px',
+      borderColor: '#e2e8f0',
+      shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+    }
+  });
+
+  const predefinedThemes: GlobalTheme[] = [
+    {
+      name: 'Professional',
+      typography: {
+        headingFont: 'Inter',
+        bodyFont: 'Inter',
+        h1Size: '2.5rem',
+        h2Size: '1.5rem',
+        bodySize: '1rem'
+      },
+      colors: {
+        primary: '#1e293b',
+        secondary: '#64748b',
+        text: '#334155',
+        background: '#ffffff',
+        accent: '#06b6d4'
+      },
+      imageStyle: {
+        borderRadius: '8px',
+        borderWidth: '0px',
+        borderColor: '#e2e8f0',
+        shadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+      }
+    },
+    {
+      name: 'Modern',
+      typography: {
+        headingFont: 'Poppins',
+        bodyFont: 'Open Sans',
+        h1Size: '3rem',
+        h2Size: '1.75rem',
+        bodySize: '1.1rem'
+      },
+      colors: {
+        primary: '#7c3aed',
+        secondary: '#a855f7',
+        text: '#1f2937',
+        background: '#fafbfc',
+        accent: '#f59e0b'
+      },
+      imageStyle: {
+        borderRadius: '16px',
+        borderWidth: '2px',
+        borderColor: '#e5e7eb',
+        shadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+      }
+    },
+    {
+      name: 'Minimal',
+      typography: {
+        headingFont: 'Helvetica',
+        bodyFont: 'Helvetica',
+        h1Size: '2rem',
+        h2Size: '1.25rem',
+        bodySize: '0.95rem'
+      },
+      colors: {
+        primary: '#000000',
+        secondary: '#6b7280',
+        text: '#374151',
+        background: '#ffffff',
+        accent: '#ef4444'
+      },
+      imageStyle: {
+        borderRadius: '4px',
+        borderWidth: '1px',
+        borderColor: '#d1d5db',
+        shadow: 'none'
+      }
+    }
+  ];
 
   const containerRef = useRef<HTMLDivElement>(null);
   const leftPanelRef = useRef<HTMLDivElement>(null);
@@ -720,19 +819,59 @@ export default function Home() {
                 className={`professional-preview cursor-pointer ${
                   selectedPage === page.id ? "selected" : ""
                 }`}
-                onClick={() => scrollToPage(page.id)}
+                onClick={() => {
+                  if (showTemplatePanel && selectedPageForTemplate === page.id) {
+                    setShowTemplatePanel(false);
+                    setSelectedPageForTemplate(null);
+                  } else {
+                    scrollToPage(page.id);
+                    setSelectedPageForTemplate(page.id);
+                    setShowTemplatePanel(true);
+                  }
+                }}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 layout
               >
-                <div className={`preview-container bg-white text-black ${gridLayout === 'double' ? 'p-6 pt-10' : 'p-8 pt-12'} rounded-lg shadow-lg aspect-[3/4] relative overflow-hidden`}>
+                <div
+                  className={`preview-container text-black ${gridLayout === 'double' ? 'p-6 pt-10' : 'p-8 pt-12'} rounded-lg shadow-lg aspect-[3/4] relative overflow-hidden`}
+                  style={{
+                    backgroundColor: currentTheme.colors.background,
+                    fontFamily: currentTheme.typography.bodyFont
+                  }}
+                >
                   {page.template === 'title' && (
                     <div className="h-full flex flex-col justify-center items-center text-center px-4">
-                      <h1 className={`${gridLayout === 'double' ? 'text-lg' : 'text-3xl'} font-bold mb-4 leading-tight`}>{page.title}</h1>
+                      <h1
+                        className={`${gridLayout === 'double' ? 'text-lg' : 'text-3xl'} font-bold mb-4 leading-tight`}
+                        style={{
+                          fontSize: gridLayout === 'double' ? '1.1rem' : currentTheme.typography.h1Size,
+                          fontFamily: currentTheme.typography.headingFont,
+                          color: currentTheme.colors.primary
+                        }}
+                      >
+                        {page.title}
+                      </h1>
                       {page.subtitle && (
-                        <p className={`${gridLayout === 'double' ? 'text-xs' : 'text-lg'} text-gray-600 mb-6`}>{page.subtitle}</p>
+                        <p
+                          className={`${gridLayout === 'double' ? 'text-xs' : 'text-lg'} mb-6`}
+                          style={{
+                            fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
+                            color: currentTheme.colors.secondary
+                          }}
+                        >
+                          {page.subtitle}
+                        </p>
                       )}
-                      <div className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} text-gray-700 max-w-md leading-relaxed`}>{page.content}</div>
+                      <div
+                        className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} max-w-md leading-relaxed`}
+                        style={{
+                          fontSize: gridLayout === 'double' ? '0.7rem' : currentTheme.typography.bodySize,
+                          color: currentTheme.colors.text
+                        }}
+                      >
+                        {page.content}
+                      </div>
                     </div>
                   )}
 
@@ -1035,6 +1174,545 @@ export default function Home() {
                 </div>
               </motion.div>
             </>
+          )}
+        </AnimatePresence>
+
+        {/* Global Theme Settings Modal */}
+        <AnimatePresence>
+          {showThemeSettings && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-black/50 z-50"
+                onClick={() => setShowThemeSettings(false)}
+              />
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4"
+              >
+                <div className="bg-background border border-border rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+                  <div className="p-6 border-b border-border">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-2xl font-semibold">Global Theme Settings</h2>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setShowThemeSettings(false)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="p-6 space-y-8">
+                    {/* Theme Presets */}
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Quick Themes</h3>
+                      <div className="grid grid-cols-3 gap-4">
+                        {predefinedThemes.map((theme) => (
+                          <div
+                            key={theme.name}
+                            onClick={() => setCurrentTheme(theme)}
+                            className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                              currentTheme.name === theme.name
+                                ? 'border-primary bg-primary/5'
+                                : 'border-border hover:border-primary/50'
+                            }`}
+                          >
+                            <div className="text-center">
+                              <div className="text-sm font-medium mb-2">{theme.name}</div>
+                              <div className="flex justify-center gap-1 mb-2">
+                                <div
+                                  className="w-4 h-4 rounded-full"
+                                  style={{ backgroundColor: theme.colors.primary }}
+                                />
+                                <div
+                                  className="w-4 h-4 rounded-full"
+                                  style={{ backgroundColor: theme.colors.accent }}
+                                />
+                                <div
+                                  className="w-4 h-4 rounded-full"
+                                  style={{ backgroundColor: theme.colors.secondary }}
+                                />
+                              </div>
+                              <div className="text-xs text-muted-foreground">{theme.typography.headingFont}</div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Typography Settings */}
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Typography</h3>
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium">Heading Font</label>
+                            <Input
+                              value={currentTheme.typography.headingFont}
+                              onChange={(e) => setCurrentTheme(prev => ({
+                                ...prev,
+                                typography: { ...prev.typography, headingFont: e.target.value }
+                              }))}
+                              placeholder="Inter, Arial, sans-serif"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Body Font</label>
+                            <Input
+                              value={currentTheme.typography.bodyFont}
+                              onChange={(e) => setCurrentTheme(prev => ({
+                                ...prev,
+                                typography: { ...prev.typography, bodyFont: e.target.value }
+                              }))}
+                              placeholder="Inter, Arial, sans-serif"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium">H1 Size</label>
+                            <Input
+                              value={currentTheme.typography.h1Size}
+                              onChange={(e) => setCurrentTheme(prev => ({
+                                ...prev,
+                                typography: { ...prev.typography, h1Size: e.target.value }
+                              }))}
+                              placeholder="2.5rem"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">H2 Size</label>
+                            <Input
+                              value={currentTheme.typography.h2Size}
+                              onChange={(e) => setCurrentTheme(prev => ({
+                                ...prev,
+                                typography: { ...prev.typography, h2Size: e.target.value }
+                              }))}
+                              placeholder="1.5rem"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Body Size</label>
+                            <Input
+                              value={currentTheme.typography.bodySize}
+                              onChange={(e) => setCurrentTheme(prev => ({
+                                ...prev,
+                                typography: { ...prev.typography, bodySize: e.target.value }
+                              }))}
+                              placeholder="1rem"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Color Settings */}
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Colors</h3>
+                      <div className="grid grid-cols-3 gap-6">
+                        {Object.entries(currentTheme.colors).map(([key, value]) => (
+                          <div key={key}>
+                            <label className="text-sm font-medium capitalize">{key}</label>
+                            <div className="flex gap-2 mt-1">
+                              <Input
+                                type="color"
+                                value={value}
+                                onChange={(e) => setCurrentTheme(prev => ({
+                                  ...prev,
+                                  colors: { ...prev.colors, [key]: e.target.value }
+                                }))}
+                                className="w-12 h-8 p-0 border cursor-pointer"
+                              />
+                              <Input
+                                value={value}
+                                onChange={(e) => setCurrentTheme(prev => ({
+                                  ...prev,
+                                  colors: { ...prev.colors, [key]: e.target.value }
+                                }))}
+                                placeholder="#000000"
+                                className="flex-1"
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Image Styling */}
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Image Styling</h3>
+                      <div className="grid grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium">Border Radius</label>
+                            <Input
+                              value={currentTheme.imageStyle.borderRadius}
+                              onChange={(e) => setCurrentTheme(prev => ({
+                                ...prev,
+                                imageStyle: { ...prev.imageStyle, borderRadius: e.target.value }
+                              }))}
+                              placeholder="8px"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Border Width</label>
+                            <Input
+                              value={currentTheme.imageStyle.borderWidth}
+                              onChange={(e) => setCurrentTheme(prev => ({
+                                ...prev,
+                                imageStyle: { ...prev.imageStyle, borderWidth: e.target.value }
+                              }))}
+                              placeholder="0px"
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="text-sm font-medium">Border Color</label>
+                            <div className="flex gap-2">
+                              <Input
+                                type="color"
+                                value={currentTheme.imageStyle.borderColor}
+                                onChange={(e) => setCurrentTheme(prev => ({
+                                  ...prev,
+                                  imageStyle: { ...prev.imageStyle, borderColor: e.target.value }
+                                }))}
+                                className="w-12 h-8 p-0 border cursor-pointer"
+                              />
+                              <Input
+                                value={currentTheme.imageStyle.borderColor}
+                                onChange={(e) => setCurrentTheme(prev => ({
+                                  ...prev,
+                                  imageStyle: { ...prev.imageStyle, borderColor: e.target.value }
+                                }))}
+                                placeholder="#e2e8f0"
+                                className="flex-1"
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Shadow</label>
+                            <Input
+                              value={currentTheme.imageStyle.shadow}
+                              onChange={(e) => setCurrentTheme(prev => ({
+                                ...prev,
+                                imageStyle: { ...prev.imageStyle, shadow: e.target.value }
+                              }))}
+                              placeholder="0 4px 6px -1px rgba(0, 0, 0, 0.1)"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="p-6 border-t border-border">
+                    <div className="flex justify-end gap-3">
+                      <Button variant="outline" onClick={() => setShowThemeSettings(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={() => setShowThemeSettings(false)} className="bg-purple-gradient text-white">
+                        Apply Theme
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Visual Template Customization Panel */}
+        <AnimatePresence>
+          {showTemplatePanel && selectedPageForTemplate && (
+            <motion.div
+              initial={{ y: '100%' }}
+              animate={{ y: '35%' }}
+              exit={{ y: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed bottom-0 right-0 h-[65%] bg-background border-t border-l border-border z-40 shadow-2xl"
+              style={{ width: rightPanelWidth }}
+            >
+              <div className="h-full flex flex-col">
+                {/* Header */}
+                <div className="p-4 border-b border-border flex-shrink-0">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold">Choose Layout Template</h3>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setShowTemplatePanel(false);
+                        setSelectedPageForTemplate(null);
+                      }}
+                      className="h-8 w-8 p-0"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Template Gallery */}
+                <div className="flex-1 p-4">
+                  <div className="text-sm font-medium mb-4">Choose Layout Template</div>
+
+                  {/* Navigation and Gallery Container */}
+                  <div className="relative">
+                    {/* Left Arrow */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 p-0 bg-background/80 backdrop-blur-sm"
+                      onClick={() => {
+                        const container = document.querySelector('.template-gallery-container') as HTMLElement;
+                        if (container) {
+                          const scrollAmount = 200;
+                          container.scrollLeft = Math.max(0, container.scrollLeft - scrollAmount);
+                          setTemplateGalleryScroll(container.scrollLeft - scrollAmount);
+                        }
+                      }}
+                      disabled={templateGalleryScroll <= 0}
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+
+                    {/* Right Arrow */}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 p-0 bg-background/80 backdrop-blur-sm"
+                      onClick={() => {
+                        const container = document.querySelector('.template-gallery-container') as HTMLElement;
+                        if (container) {
+                          const scrollAmount = 200;
+                          const maxScroll = container.scrollWidth - container.clientWidth;
+                          container.scrollLeft = Math.min(maxScroll, container.scrollLeft + scrollAmount);
+                          setTemplateGalleryScroll(container.scrollLeft + scrollAmount);
+                        }
+                      }}
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+
+                    {/* Scrollable Template Gallery */}
+                    <motion.div
+                      className="template-gallery-container flex gap-4 overflow-x-auto scrollbar-hide py-2 px-8"
+                      onScroll={(e) => {
+                        const target = e.target as HTMLElement;
+                        setTemplateGalleryScroll(target.scrollLeft);
+                      }}
+                      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2, duration: 0.5 }}
+                    >
+                    {templates.map((template, index) => {
+                      const currentPage = pages.find(p => p.id === selectedPageForTemplate);
+                      const isSelected = currentPage?.template === template.value;
+
+                      if (!currentPage) return null;
+
+                      return (
+                        <motion.div
+                          key={template.value}
+                          onClick={() => updatePage(currentPage.id, { template: template.value })}
+                          className="cursor-pointer flex-shrink-0"
+                          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          transition={{
+                            delay: 0.3 + (index * 0.1),
+                            duration: 0.4,
+                            type: "spring",
+                            damping: 20,
+                            stiffness: 300
+                          }}
+                          whileHover={{ y: -5 }}
+                        >
+                          <motion.div
+                            className="w-56 h-48 bg-white border border-border rounded-lg overflow-hidden relative"
+                            whileHover={{
+                              scale: 1.05,
+                              borderColor: currentTheme.colors.primary,
+                              boxShadow: `0 8px 32px ${currentTheme.colors.primary}33`
+                            }}
+                            whileTap={{ scale: 0.98 }}
+                            transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                            animate={{
+                              borderColor: isSelected ? currentTheme.colors.primary : 'transparent'
+                            }}
+                          >
+                            <div
+                              className="h-full p-2 text-black"
+                              style={{
+                                backgroundColor: currentTheme.colors.background,
+                                fontFamily: currentTheme.typography.bodyFont,
+                                fontSize: '0.5rem'
+                              }}
+                            >
+                              {/* Title Template */}
+                              {template.value === 'title' && (
+                                <div className="h-full flex flex-col justify-center items-center text-center">
+                                  <h1 style={{ fontSize: '0.6rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', marginBottom: '0.25rem' }}>
+                                    {currentPage.title}
+                                  </h1>
+                                  <div style={{ fontSize: '0.4rem', color: currentTheme.colors.text }}>
+                                    {currentPage.content.slice(0, 50)}...
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Text Image Right */}
+                              {template.value === 'text-image-right' && (
+                                <div className="h-full flex gap-1">
+                                  <div className="flex-1">
+                                    <h2 style={{ fontSize: '0.5rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', marginBottom: '0.2rem' }}>
+                                      {currentPage.title}
+                                    </h2>
+                                    <div style={{ fontSize: '0.35rem', color: currentTheme.colors.text, lineHeight: '1.2' }}>
+                                      {currentPage.content.slice(0, 60)}...
+                                    </div>
+                                  </div>
+                                  <div className="w-1/3">
+                                    {currentPage.images.length > 0 ? (
+                                      <img
+                                        src={currentPage.images[0]}
+                                        alt="preview"
+                                        className="w-full h-12 object-cover"
+                                        style={{ borderRadius: '2px' }}
+                                      />
+                                    ) : (
+                                      <div className="w-full h-12 bg-gray-200 rounded flex items-center justify-center">
+                                        <ImageIcon className="w-3 h-3 text-gray-400" />
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Text Image Left */}
+                              {template.value === 'text-image-left' && (
+                                <div className="h-full flex gap-1">
+                                  <div className="w-1/3">
+                                    {currentPage.images.length > 0 ? (
+                                      <img
+                                        src={currentPage.images[0]}
+                                        alt="preview"
+                                        className="w-full h-12 object-cover"
+                                        style={{ borderRadius: '2px' }}
+                                      />
+                                    ) : (
+                                      <div className="w-full h-12 bg-gray-200 rounded flex items-center justify-center">
+                                        <ImageIcon className="w-3 h-3 text-gray-400" />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex-1">
+                                    <h2 style={{ fontSize: '0.5rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', marginBottom: '0.2rem' }}>
+                                      {currentPage.title}
+                                    </h2>
+                                    <div style={{ fontSize: '0.35rem', color: currentTheme.colors.text, lineHeight: '1.2' }}>
+                                      {currentPage.content.slice(0, 60)}...
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Image Top Text */}
+                              {template.value === 'image-top-text' && (
+                                <div className="h-full flex flex-col">
+                                  <div className="h-1/2 mb-1">
+                                    {currentPage.images.length > 0 ? (
+                                      <img
+                                        src={currentPage.images[0]}
+                                        alt="preview"
+                                        className="w-full h-full object-cover"
+                                        style={{ borderRadius: '2px' }}
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center">
+                                        <ImageIcon className="w-4 h-4 text-gray-400" />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="flex-1">
+                                    <h2 style={{ fontSize: '0.5rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', marginBottom: '0.2rem' }}>
+                                      {currentPage.title}
+                                    </h2>
+                                    <div style={{ fontSize: '0.35rem', color: currentTheme.colors.text, lineHeight: '1.2' }}>
+                                      {currentPage.content.slice(0, 40)}...
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Text Top Image */}
+                              {template.value === 'text-top-image' && (
+                                <div className="h-full flex flex-col">
+                                  <div className="flex-1 mb-1">
+                                    <h2 style={{ fontSize: '0.5rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', marginBottom: '0.2rem' }}>
+                                      {currentPage.title}
+                                    </h2>
+                                    <div style={{ fontSize: '0.35rem', color: currentTheme.colors.text, lineHeight: '1.2' }}>
+                                      {currentPage.content.slice(0, 40)}...
+                                    </div>
+                                  </div>
+                                  <div className="h-1/2">
+                                    {currentPage.images.length > 0 ? (
+                                      <img
+                                        src={currentPage.images[0]}
+                                        alt="preview"
+                                        className="w-full h-full object-cover"
+                                        style={{ borderRadius: '2px' }}
+                                      />
+                                    ) : (
+                                      <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center">
+                                        <ImageIcon className="w-4 h-4 text-gray-400" />
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Text Only */}
+                              {template.value === 'text-only' && (
+                                <div className="h-full p-1">
+                                  <h2 style={{ fontSize: '0.5rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', marginBottom: '0.3rem' }}>
+                                    {currentPage.title}
+                                  </h2>
+                                  <div style={{ fontSize: '0.35rem', color: currentTheme.colors.text, lineHeight: '1.3' }}>
+                                    {currentPage.content.slice(0, 100)}...
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Table of Contents */}
+                              {template.value === 'table-of-contents' && (
+                                <div className="h-full p-1">
+                                  <h2 style={{ fontSize: '0.5rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', textAlign: 'center', marginBottom: '0.3rem' }}>
+                                    {currentPage.title}
+                                  </h2>
+                                  <div className="bg-cyan-50 p-1 rounded" style={{ fontSize: '0.3rem', color: currentTheme.colors.text }}>
+                                    {currentPage.content.slice(0, 80)}...
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                        </motion.div>
+                      );
+                    })}
+                    </motion.div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           )}
         </AnimatePresence>
       </div>
