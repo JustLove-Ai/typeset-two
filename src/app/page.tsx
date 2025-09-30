@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 // Template types for different page layouts
-type TemplateType = 'title' | 'text-image-right' | 'text-image-left' | 'image-top-text' | 'text-top-image' | 'text-only' | 'table-of-contents';
+type TemplateType = 'title' | 'text-image-right' | 'text-image-left' | 'image-top-text' | 'text-top-image' | 'text-only' | 'table-of-contents' | 'full-image' | 'image-grid-2' | 'image-grid-3' | 'image-grid-4' | 'image-grid-multi' | 'color-block-left' | 'color-block-top' | 'color-split' | 'accent-sidebar' | 'magazine-layout' | 'hero-banner' | 'timeline';
 
 // Global theme interface for premium styling
 interface GlobalTheme {
@@ -132,11 +132,10 @@ export default function Home() {
   const [isResizing, setIsResizing] = useState<boolean>(false);
   const [gridLayout, setGridLayout] = useState<'single' | 'double'>('double');
   const [showThemeSettings, setShowThemeSettings] = useState<boolean>(false);
-  const [showTemplatePanel, setShowTemplatePanel] = useState<boolean>(false);
-  const [selectedPageForTemplate, setSelectedPageForTemplate] = useState<number | null>(null);
-  const [templateGalleryScroll, setTemplateGalleryScroll] = useState(0);
+  const [expandedPageForTemplates, setExpandedPageForTemplates] = useState<number | null>(null);
   const [activeThemeTab, setActiveThemeTab] = useState<'themes' | 'typography' | 'colors' | 'backgrounds'>('themes');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [selectedGradientFilter, setSelectedGradientFilter] = useState<string>('All');
   const [currentTheme, setCurrentTheme] = useState<GlobalTheme>({
     name: 'Corporate Blue',
     category: 'Business',
@@ -236,7 +235,13 @@ export default function Home() {
         borderRadius: '4px',
         borderWidth: '1px',
         borderColor: '#e5e7eb',
-        shadow: '0 8px 25px -5px rgba(0, 0, 0, 0.1)'
+        shadow: '0 8px 25px -5px rgba(0, 0, 0, 0.1)',
+        bordersEnabled: false
+      },
+      banners: {
+        enabled: false,
+        color: '#ffd700',
+        opacity: 0.1
       }
     },
     {
@@ -265,7 +270,13 @@ export default function Home() {
         borderRadius: '12px',
         borderWidth: '2px',
         borderColor: '#d69e2e',
-        shadow: '0 10px 15px -3px rgba(214, 158, 46, 0.1)'
+        shadow: '0 10px 15px -3px rgba(214, 158, 46, 0.1)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#d69e2e',
+        opacity: 0.1
       }
     },
     {
@@ -333,7 +344,13 @@ export default function Home() {
         borderRadius: '20px',
         borderWidth: '3px',
         borderColor: '#e53e3e',
-        shadow: '0 20px 25px -5px rgba(229, 62, 62, 0.1)'
+        shadow: '0 20px 25px -5px rgba(229, 62, 62, 0.1)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#e53e3e',
+        opacity: 0.1
       }
     },
     {
@@ -363,7 +380,13 @@ export default function Home() {
         borderRadius: '25px',
         borderWidth: '4px',
         borderColor: '#4c1d95',
-        shadow: '0 25px 50px -12px rgba(76, 29, 149, 0.25)'
+        shadow: '0 25px 50px -12px rgba(76, 29, 149, 0.25)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#4c1d95',
+        opacity: 0.1
       }
     },
     {
@@ -392,7 +415,13 @@ export default function Home() {
         borderRadius: '2px',
         borderWidth: '0px',
         borderColor: 'transparent',
-        shadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+        shadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#10b981',
+        opacity: 0.1
       }
     },
 
@@ -460,7 +489,13 @@ export default function Home() {
         borderRadius: '10px',
         borderWidth: '1px',
         borderColor: '#e2e8f0',
-        shadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+        shadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#553c9a',
+        opacity: 0.1
       }
     },
 
@@ -492,7 +527,13 @@ export default function Home() {
         borderRadius: '15px',
         borderWidth: '2px',
         borderColor: '#e6a85c',
-        shadow: '0 20px 25px -5px rgba(230, 168, 92, 0.1)'
+        shadow: '0 20px 25px -5px rgba(230, 168, 92, 0.1)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#e6a85c',
+        opacity: 0.1
       }
     },
     {
@@ -522,7 +563,13 @@ export default function Home() {
         borderRadius: '12px',
         borderWidth: '1px',
         borderColor: '#cbd5e0',
-        shadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+        shadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#805ad5',
+        opacity: 0.1
       }
     },
 
@@ -554,7 +601,13 @@ export default function Home() {
         borderRadius: '16px',
         borderWidth: '0px',
         borderColor: 'transparent',
-        shadow: '0 20px 25px -5px rgba(59, 130, 246, 0.1)'
+        shadow: '0 20px 25px -5px rgba(59, 130, 246, 0.1)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#06b6d4',
+        opacity: 0.1
       }
     },
     {
@@ -584,7 +637,13 @@ export default function Home() {
         borderRadius: '20px',
         borderWidth: '0px',
         borderColor: 'transparent',
-        shadow: '0 25px 50px -12px rgba(124, 58, 237, 0.25)'
+        shadow: '0 25px 50px -12px rgba(124, 58, 237, 0.25)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#7c3aed',
+        opacity: 0.1
       }
     },
 
@@ -616,7 +675,13 @@ export default function Home() {
         borderRadius: '12px',
         borderWidth: '2px',
         borderColor: '#4299e1',
-        shadow: '0 10px 15px -3px rgba(66, 153, 225, 0.1)'
+        shadow: '0 10px 15px -3px rgba(66, 153, 225, 0.1)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#2b6cb0',
+        opacity: 0.1
       }
     },
     {
@@ -646,7 +711,295 @@ export default function Home() {
         borderRadius: '8px',
         borderWidth: '1px',
         borderColor: '#d1fae5',
-        shadow: '0 4px 6px -1px rgba(16, 185, 129, 0.1)'
+        shadow: '0 4px 6px -1px rgba(16, 185, 129, 0.1)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#065f46',
+        opacity: 0.1
+      }
+    },
+
+    // BOLD TYPOGRAPHY & DISTINCTIVE STYLES
+    {
+      name: 'Bold Impact',
+      category: 'Creative',
+      description: 'Ultra-bold typography for maximum visual impact',
+      typography: {
+        headingFont: 'Impact',
+        bodyFont: 'Arial Black',
+        h1Size: '4rem',
+        h2Size: '2.5rem',
+        bodySize: '1.2rem'
+      },
+      colors: {
+        primary: '#000000',
+        secondary: '#333333',
+        text: '#1a1a1a',
+        background: '#ffffff',
+        accent: '#ff0000'
+      },
+      coverBackground: {
+        type: 'solid',
+        value: '#000000'
+      },
+      imageStyle: {
+        borderRadius: '0px',
+        borderWidth: '4px',
+        borderColor: '#000000',
+        shadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#ff0000',
+        opacity: 0.2
+      }
+    },
+    {
+      name: 'Fancy Script',
+      category: 'Creative',
+      description: 'Elegant script fonts with decorative flourishes',
+      typography: {
+        headingFont: 'Dancing Script',
+        bodyFont: 'Libre Baskerville',
+        h1Size: '4.5rem',
+        h2Size: '2.8rem',
+        bodySize: '1.15rem'
+      },
+      colors: {
+        primary: '#2c1810',
+        secondary: '#8b4513',
+        text: '#3e2723',
+        background: '#fefefe',
+        accent: '#d4af37'
+      },
+      coverBackground: {
+        type: 'solid',
+        value: '#2c1810'
+      },
+      imageStyle: {
+        borderRadius: '20px',
+        borderWidth: '3px',
+        borderColor: '#d4af37',
+        shadow: '0 12px 24px rgba(212, 175, 55, 0.2)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#d4af37',
+        opacity: 0.15
+      }
+    },
+    {
+      name: 'Doodle Fun',
+      category: 'Creative',
+      description: 'Playful handwritten style with whimsical elements',
+      typography: {
+        headingFont: 'Kalam',
+        bodyFont: 'Comic Neue',
+        h1Size: '3.5rem',
+        h2Size: '2.2rem',
+        bodySize: '1.1rem'
+      },
+      colors: {
+        primary: '#6b46c1',
+        secondary: '#ec4899',
+        text: '#374151',
+        background: '#fffbeb',
+        accent: '#f59e0b'
+      },
+      coverBackground: {
+        type: 'solid',
+        value: '#fffbeb'
+      },
+      imageStyle: {
+        borderRadius: '25px',
+        borderWidth: '5px',
+        borderColor: '#ec4899',
+        shadow: '0 15px 35px rgba(236, 72, 153, 0.25)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#f59e0b',
+        opacity: 0.2
+      }
+    },
+    {
+      name: 'Newspaper Bold',
+      category: 'Editorial',
+      description: 'Classic newspaper layout with strong headlines',
+      typography: {
+        headingFont: 'Times New Roman',
+        bodyFont: 'Georgia',
+        h1Size: '3.8rem',
+        h2Size: '2.4rem',
+        bodySize: '1.1rem'
+      },
+      colors: {
+        primary: '#000000',
+        secondary: '#404040',
+        text: '#1a1a1a',
+        background: '#ffffff',
+        accent: '#c41e3a'
+      },
+      coverBackground: {
+        type: 'solid',
+        value: '#ffffff'
+      },
+      imageStyle: {
+        borderRadius: '2px',
+        borderWidth: '2px',
+        borderColor: '#000000',
+        shadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#c41e3a',
+        opacity: 0.1
+      }
+    },
+    {
+      name: 'Modern Sans Ultra',
+      category: 'Business',
+      description: 'Ultra-modern sans serif with geometric precision',
+      typography: {
+        headingFont: 'Montserrat Black',
+        bodyFont: 'Roboto',
+        h1Size: '3.2rem',
+        h2Size: '2rem',
+        bodySize: '1.05rem'
+      },
+      colors: {
+        primary: '#1f2937',
+        secondary: '#4b5563',
+        text: '#374151',
+        background: '#ffffff',
+        accent: '#3b82f6'
+      },
+      coverBackground: {
+        type: 'solid',
+        value: '#1f2937'
+      },
+      imageStyle: {
+        borderRadius: '12px',
+        borderWidth: '0px',
+        borderColor: 'transparent',
+        shadow: '0 20px 40px rgba(31, 41, 55, 0.15)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: false,
+        color: '#3b82f6',
+        opacity: 0.1
+      }
+    },
+    {
+      name: 'Retro Typewriter',
+      category: 'Editorial',
+      description: 'Vintage typewriter aesthetic with monospace charm',
+      typography: {
+        headingFont: 'Courier New',
+        bodyFont: 'Courier New',
+        h1Size: '3rem',
+        h2Size: '1.8rem',
+        bodySize: '1rem'
+      },
+      colors: {
+        primary: '#2d2d2d',
+        secondary: '#555555',
+        text: '#333333',
+        background: '#f5f5dc',
+        accent: '#8b4513'
+      },
+      coverBackground: {
+        type: 'solid',
+        value: '#f5f5dc'
+      },
+      imageStyle: {
+        borderRadius: '4px',
+        borderWidth: '3px',
+        borderColor: '#2d2d2d',
+        shadow: '0 6px 12px rgba(45, 45, 45, 0.2)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#8b4513',
+        opacity: 0.15
+      }
+    },
+    {
+      name: 'Gothic Drama',
+      category: 'Creative',
+      description: 'Dramatic gothic styling with intense contrast',
+      typography: {
+        headingFont: 'Cinzel',
+        bodyFont: 'Crimson Text',
+        h1Size: '4rem',
+        h2Size: '2.6rem',
+        bodySize: '1.15rem'
+      },
+      colors: {
+        primary: '#1a0000',
+        secondary: '#4d0000',
+        text: '#2d0000',
+        background: '#fff8f8',
+        accent: '#dc2626'
+      },
+      coverBackground: {
+        type: 'solid',
+        value: '#1a0000'
+      },
+      imageStyle: {
+        borderRadius: '8px',
+        borderWidth: '4px',
+        borderColor: '#dc2626',
+        shadow: '0 16px 32px rgba(220, 38, 38, 0.3)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#dc2626',
+        opacity: 0.2
+      }
+    },
+    {
+      name: 'Chunky Display',
+      category: 'Creative',
+      description: 'Extra chunky display fonts for bold statements',
+      typography: {
+        headingFont: 'Fredoka One',
+        bodyFont: 'Open Sans',
+        h1Size: '4.5rem',
+        h2Size: '2.8rem',
+        bodySize: '1.1rem'
+      },
+      colors: {
+        primary: '#7c2d12',
+        secondary: '#ea580c',
+        text: '#451a03',
+        background: '#fffbeb',
+        accent: '#f59e0b'
+      },
+      coverBackground: {
+        type: 'solid',
+        value: '#7c2d12'
+      },
+      imageStyle: {
+        borderRadius: '16px',
+        borderWidth: '6px',
+        borderColor: '#ea580c',
+        shadow: '0 20px 40px rgba(234, 88, 12, 0.25)',
+        bordersEnabled: true
+      },
+      banners: {
+        enabled: true,
+        color: '#f59e0b',
+        opacity: 0.2
       }
     }
   ];
@@ -944,6 +1297,18 @@ export default function Home() {
     };
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
+  // Handle keyboard shortcuts
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showImageTray) {
+        closeImageTray();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [showImageTray]);
+
   const getTemplateIcon = (template: TemplateType) => {
     switch (template) {
       case 'title': return <Type className="w-4 h-4" />;
@@ -957,6 +1322,96 @@ export default function Home() {
     }
   };
 
+  // Template categorization function
+  const categorizeTemplate = (templateValue: TemplateType): 'text-only' | 'image-heavy' | 'mixed' => {
+    const textOnlyTemplates = ['title', 'text-only', 'table-of-contents'];
+    const imageHeavyTemplates = ['full-image', 'image-grid-2', 'image-grid-3', 'image-grid-4', 'image-grid-multi'];
+
+    if (textOnlyTemplates.includes(templateValue)) return 'text-only';
+    if (imageHeavyTemplates.includes(templateValue)) return 'image-heavy';
+    return 'mixed'; // For mixed templates: text-image-right, text-image-left, image-top-text, text-top-image, hero-banner, color-block-left, color-block-top
+  };
+
+  // Page content analysis function - now returns exact image count for intelligent filtering
+  const analyzePageContent = (page: ContentPage): { imageCount: number; hasImages: boolean } => {
+    const imageCount = page.images.length;
+    return { imageCount, hasImages: imageCount > 0 };
+  };
+
+  // Intelligent template filtering function - hides templates that don't make sense for the content
+  const getFilteredTemplatesForPage = (page: ContentPage, templates: { value: TemplateType; label: string; category?: string }[]) => {
+    const { imageCount } = analyzePageContent(page);
+
+    // Always available templates regardless of image count
+    const alwaysAvailable = ['title', 'text-only', 'table-of-contents', 'hero-banner', 'color-block-left', 'color-block-top'];
+
+    return templates.filter(template => {
+      // Always show these templates
+      if (alwaysAvailable.includes(template.value)) {
+        return true;
+      }
+
+      // Filter based on image count
+      switch (template.value) {
+        case 'full-image':
+        case 'text-image-right':
+        case 'text-image-left':
+        case 'image-top-text':
+        case 'text-top-image':
+          // Single image templates - show if has at least 1 image
+          return imageCount >= 1;
+
+        case 'image-grid-2':
+          // 2-image grid - show if has at least 2 images
+          return imageCount >= 2;
+
+        case 'image-grid-3':
+          // 3-image grid - show if has at least 3 images
+          return imageCount >= 3;
+
+        case 'image-grid-4':
+          // 4-image grid - show if has at least 4 images
+          return imageCount >= 4;
+
+        case 'image-grid-multi':
+          // Multi-image grid - show if has 3 or more images
+          return imageCount >= 3;
+
+        default:
+          return true;
+      }
+    }).sort((a, b) => {
+      // Smart sorting - prioritize templates that match the content
+      const aCategory = categorizeTemplate(a.value);
+      const bCategory = categorizeTemplate(b.value);
+
+      let aScore = 0;
+      let bScore = 0;
+
+      if (imageCount > 0) {
+        // Has images - prioritize image/mixed templates
+        if (aCategory === 'image-heavy') aScore += 3;
+        else if (aCategory === 'mixed') aScore += 2;
+        else aScore += 1;
+
+        if (bCategory === 'image-heavy') bScore += 3;
+        else if (bCategory === 'mixed') bScore += 2;
+        else bScore += 1;
+      } else {
+        // No images - prioritize text-only templates
+        if (aCategory === 'text-only') aScore += 3;
+        else if (aCategory === 'mixed') aScore += 2;
+        else aScore += 1;
+
+        if (bCategory === 'text-only') bScore += 3;
+        else if (bCategory === 'mixed') bScore += 2;
+        else bScore += 1;
+      }
+
+      return bScore - aScore;
+    });
+  };
+
   const templates: { value: TemplateType; label: string }[] = [
     { value: 'title', label: 'Title Page' },
     { value: 'text-image-right', label: 'Text Left, Image Right' },
@@ -964,8 +1419,337 @@ export default function Home() {
     { value: 'image-top-text', label: 'Image Top, Text Bottom' },
     { value: 'text-top-image', label: 'Text Top, Image Bottom' },
     { value: 'text-only', label: 'Text Only' },
-    { value: 'table-of-contents', label: 'Table of Contents' }
+    { value: 'table-of-contents', label: 'Table of Contents' },
+    { value: 'full-image', label: 'Full Image' },
+    { value: 'image-grid-2', label: '2-Image Grid' },
+    { value: 'image-grid-3', label: '3-Image Grid' },
+    { value: 'image-grid-4', label: '4-Image Grid' },
+    { value: 'image-grid-multi', label: 'Multi-Image Grid' },
+    { value: 'color-block-left', label: 'Color Sidebar' },
+    { value: 'color-block-top', label: 'Color Header' },
+    { value: 'hero-banner', label: 'Hero Banner' }
   ];
+
+  // Render template content with actual page data
+  const renderTemplateContent = (page: ContentPage, templateType: TemplateType, theme: GlobalTheme, isPreview: boolean = false) => {
+    const scale = isPreview ? 0.8 : 1;
+    const baseSize = isPreview ? '0.3rem' : '1rem';
+
+    const commonStyles = {
+      fontSize: baseSize,
+      lineHeight: isPreview ? '1.2' : '1.6',
+      transform: `scale(${scale})`,
+      transformOrigin: 'top left',
+      width: `${100 / scale}%`,
+      height: `${100 / scale}%`
+    };
+
+    switch (templateType) {
+      case 'title':
+        return (
+          <div className="h-full flex flex-col justify-center items-center text-center p-2" style={commonStyles}>
+            <h1 style={{ fontSize: isPreview ? '0.5rem' : '2rem', fontWeight: 'bold', marginBottom: isPreview ? '0.2rem' : '1rem', color: '#ffffff' }}>
+              {page.title}
+            </h1>
+            <p style={{ fontSize: isPreview ? '0.25rem' : '1rem', color: '#ffffff', opacity: 0.9 }}>
+              {page.content?.slice(0, 50) || 'Title page content...'}
+            </p>
+          </div>
+        );
+
+      case 'full-image':
+        return (
+          <div className="h-full relative" style={commonStyles}>
+            {page.images.length > 0 ? (
+              <img src={page.images[0]} alt="Full image" className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-rose-400 via-fuchsia-500 to-indigo-500 flex items-center justify-center">
+                <div className="text-center text-white">
+                  <div style={{ fontSize: isPreview ? '0.4rem' : '2rem', fontWeight: 'bold', marginBottom: isPreview ? '0.1rem' : '0.5rem' }}>FULL IMAGE</div>
+                  <div style={{ fontSize: isPreview ? '0.2rem' : '1rem', opacity: 0.8 }}>Background Layout</div>
+                </div>
+              </div>
+            )}
+            <div className="absolute bottom-0 left-0 right-0 p-2 bg-black/50 text-white">
+              <h2 style={{ fontSize: isPreview ? '0.4rem' : '1.5rem', fontWeight: 'bold' }}>{page.title}</h2>
+              {page.content && (
+                <p style={{ fontSize: isPreview ? '0.25rem' : '1rem', opacity: 0.9 }}>
+                  {page.content.slice(0, 60)}...
+                </p>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'text-image-right':
+        return (
+          <div className="h-full flex gap-2 p-2" style={commonStyles}>
+            <div className="flex-1">
+              <h2 style={{ fontSize: isPreview ? '0.4rem' : '1.25rem', fontWeight: 'bold', marginBottom: isPreview ? '0.1rem' : '0.5rem' }}>
+                {page.title}
+              </h2>
+              <p style={{ fontSize: isPreview ? '0.25rem' : '0.9rem' }}>
+                {page.content || 'Page content will appear here...'}
+              </p>
+            </div>
+            <div className="w-1/3">
+              {page.images.length > 0 ? (
+                <img src={page.images[0]} alt="Content" className="w-full h-full object-cover rounded" />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400 rounded flex items-center justify-center">
+                  <span style={{ fontSize: isPreview ? '0.2rem' : '0.8rem', color: '#444', fontWeight: 'bold' }}>IMG</span>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'text-image-left':
+        return (
+          <div className="h-full flex gap-2 p-2" style={commonStyles}>
+            <div className="w-1/3">
+              {page.images.length > 0 ? (
+                <img src={page.images[0]} alt="Content" className="w-full h-full object-cover rounded" />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400 rounded flex items-center justify-center">
+                  <span style={{ fontSize: isPreview ? '0.2rem' : '0.8rem', color: '#444', fontWeight: 'bold' }}>IMG</span>
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <h2 style={{ fontSize: isPreview ? '0.4rem' : '1.25rem', fontWeight: 'bold', marginBottom: isPreview ? '0.1rem' : '0.5rem' }}>
+                {page.title}
+              </h2>
+              <p style={{ fontSize: isPreview ? '0.25rem' : '0.9rem' }}>
+                {page.content || 'Page content will appear here...'}
+              </p>
+            </div>
+          </div>
+        );
+
+      case 'text-only':
+        return (
+          <div className="h-full p-2" style={commonStyles}>
+            <h2 style={{ fontSize: isPreview ? '0.4rem' : '1.25rem', fontWeight: 'bold', marginBottom: isPreview ? '0.2rem' : '0.5rem' }}>
+              {page.title}
+            </h2>
+            <p style={{ fontSize: isPreview ? '0.25rem' : '0.9rem', lineHeight: isPreview ? '1.2' : '1.6' }}>
+              {page.content || 'This is a text-only layout. Your content will appear here with clean typography and optimal readability.'}
+            </p>
+          </div>
+        );
+
+      case 'image-grid-2':
+        return (
+          <div className="h-full p-1" style={commonStyles}>
+            <h2 style={{ fontSize: isPreview ? '0.35rem' : '1.1rem', fontWeight: 'bold', textAlign: 'center', marginBottom: isPreview ? '0.1rem' : '0.5rem' }}>
+              {page.title}
+            </h2>
+            <div className="flex-1 grid grid-cols-2 gap-1">
+              {[0, 1].map((index) => (
+                <div key={index}>
+                  {page.images[index] ? (
+                    <img src={page.images[index]} alt={`Image ${index + 1}`} className="w-full h-full object-cover rounded-sm" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-emerald-200 to-teal-300 rounded-sm flex items-center justify-center">
+                      <span style={{ fontSize: isPreview ? '0.2rem' : '0.8rem', color: '#065f46', fontWeight: 'bold' }}>{index + 1}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'image-grid-3':
+        return (
+          <div className="h-full p-1" style={commonStyles}>
+            <h2 style={{ fontSize: isPreview ? '0.35rem' : '1.1rem', fontWeight: 'bold', textAlign: 'center', marginBottom: isPreview ? '0.1rem' : '0.5rem' }}>
+              {page.title}
+            </h2>
+            <div className="flex-1 grid grid-cols-2 gap-1">
+              {[0, 1, 2].map((index) => (
+                <div key={index} className={index === 2 ? 'col-span-2' : ''}>
+                  {page.images[index] ? (
+                    <img src={page.images[index]} alt={`Image ${index + 1}`} className="w-full h-full object-cover rounded-sm" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-emerald-200 to-teal-300 rounded-sm flex items-center justify-center">
+                      <span style={{ fontSize: isPreview ? '0.2rem' : '0.8rem', color: '#065f46', fontWeight: 'bold' }}>{index + 1}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'image-grid-4':
+        return (
+          <div className="h-full p-1" style={commonStyles}>
+            <h2 style={{ fontSize: isPreview ? '0.35rem' : '1.1rem', fontWeight: 'bold', textAlign: 'center', marginBottom: isPreview ? '0.1rem' : '0.5rem' }}>
+              {page.title}
+            </h2>
+            <div className="flex-1 grid grid-cols-2 gap-1">
+              {[0, 1, 2, 3].map((index) => (
+                <div key={index}>
+                  {page.images[index] ? (
+                    <img src={page.images[index]} alt={`Image ${index + 1}`} className="w-full h-full object-cover rounded-sm" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-emerald-200 to-teal-300 rounded-sm flex items-center justify-center">
+                      <span style={{ fontSize: isPreview ? '0.2rem' : '0.8rem', color: '#065f46', fontWeight: 'bold' }}>{index + 1}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'image-grid-multi':
+        return (
+          <div className="h-full p-1" style={commonStyles}>
+            <h2 style={{ fontSize: isPreview ? '0.35rem' : '1.1rem', fontWeight: 'bold', textAlign: 'center', marginBottom: isPreview ? '0.1rem' : '0.5rem' }}>
+              {page.title}
+            </h2>
+            <div className="flex-1 grid grid-cols-3 gap-1">
+              {[0, 1, 2, 3, 4, 5].map((index) => (
+                <div key={index}>
+                  {page.images[index] ? (
+                    <img src={page.images[index]} alt={`Image ${index + 1}`} className="w-full h-full object-cover rounded-sm" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-emerald-200 to-teal-300 rounded-sm flex items-center justify-center">
+                      <span style={{ fontSize: isPreview ? '0.15rem' : '0.7rem', color: '#065f46', fontWeight: 'bold' }}>{index + 1}</span>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+      case 'hero-banner':
+        return (
+          <div className="h-full relative overflow-hidden" style={commonStyles}>
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600"></div>
+            <div className="relative h-full flex flex-col justify-center items-center text-center p-2">
+              <h1 style={{
+                fontSize: isPreview ? '0.6rem' : '2.5rem',
+                fontWeight: 'bold',
+                marginBottom: isPreview ? '0.2rem' : '1rem',
+                color: '#ffffff',
+                textShadow: '0 2px 4px rgba(0,0,0,0.3)'
+              }}>
+                {page.title}
+              </h1>
+              <p style={{
+                fontSize: isPreview ? '0.3rem' : '1.2rem',
+                color: '#ffffff',
+                opacity: 0.9,
+                textShadow: '0 1px 2px rgba(0,0,0,0.3)'
+              }}>
+                {page.content?.slice(0, 80) || 'Epic hero banner content...'}
+              </p>
+            </div>
+          </div>
+        );
+
+      case 'color-block-left':
+        return (
+          <div className="h-full flex" style={commonStyles}>
+            <div className="w-1/3 bg-gradient-to-b from-indigo-500 to-purple-600 flex items-center justify-center">
+              <div className="text-white text-center p-1">
+                <div style={{ fontSize: isPreview ? '0.2rem' : '0.8rem', fontWeight: 'bold' }}>SIDEBAR</div>
+              </div>
+            </div>
+            <div className="flex-1 p-2 bg-white">
+              <h2 style={{ fontSize: isPreview ? '0.4rem' : '1.25rem', fontWeight: 'bold', marginBottom: isPreview ? '0.1rem' : '0.5rem', color: '#333' }}>
+                {page.title}
+              </h2>
+              <p style={{ fontSize: isPreview ? '0.25rem' : '0.9rem', color: '#666' }}>
+                {page.content || 'Content with color sidebar layout...'}
+              </p>
+            </div>
+          </div>
+        );
+
+      case 'color-block-top':
+        return (
+          <div className="h-full flex flex-col" style={commonStyles}>
+            <div className="h-1/4 bg-gradient-to-r from-teal-500 to-cyan-600 flex items-center justify-center">
+              <div className="text-white text-center">
+                <div style={{ fontSize: isPreview ? '0.25rem' : '1rem', fontWeight: 'bold' }}>HEADER</div>
+              </div>
+            </div>
+            <div className="flex-1 p-2 bg-white">
+              <h2 style={{ fontSize: isPreview ? '0.4rem' : '1.25rem', fontWeight: 'bold', marginBottom: isPreview ? '0.1rem' : '0.5rem', color: '#333' }}>
+                {page.title}
+              </h2>
+              <p style={{ fontSize: isPreview ? '0.25rem' : '0.9rem', color: '#666' }}>
+                {page.content || 'Content with color header layout...'}
+              </p>
+            </div>
+          </div>
+        );
+
+      case 'image-top-text':
+        return (
+          <div className="h-full flex flex-col" style={commonStyles}>
+            <div className="h-1/2">
+              {page.images.length > 0 ? (
+                <img src={page.images[0]} alt="Top image" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
+                  <span style={{ fontSize: isPreview ? '0.25rem' : '1rem', color: 'white', fontWeight: 'bold' }}>IMAGE</span>
+                </div>
+              )}
+            </div>
+            <div className="flex-1 p-2 bg-white">
+              <h2 style={{ fontSize: isPreview ? '0.4rem' : '1.25rem', fontWeight: 'bold', marginBottom: isPreview ? '0.1rem' : '0.5rem', color: '#333' }}>
+                {page.title}
+              </h2>
+              <p style={{ fontSize: isPreview ? '0.25rem' : '0.9rem', color: '#666' }}>
+                {page.content || 'Text content below image...'}
+              </p>
+            </div>
+          </div>
+        );
+
+      case 'text-top-image':
+        return (
+          <div className="h-full flex flex-col" style={commonStyles}>
+            <div className="flex-1 p-2 bg-white">
+              <h2 style={{ fontSize: isPreview ? '0.4rem' : '1.25rem', fontWeight: 'bold', marginBottom: isPreview ? '0.1rem' : '0.5rem', color: '#333' }}>
+                {page.title}
+              </h2>
+              <p style={{ fontSize: isPreview ? '0.25rem' : '0.9rem', color: '#666' }}>
+                {page.content || 'Text content above image...'}
+              </p>
+            </div>
+            <div className="h-1/2">
+              {page.images.length > 0 ? (
+                <img src={page.images[0]} alt="Bottom image" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center">
+                  <span style={{ fontSize: isPreview ? '0.25rem' : '1rem', color: 'white', fontWeight: 'bold' }}>IMAGE</span>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      default:
+        return (
+          <div className="h-full p-2 flex flex-col justify-center items-center" style={commonStyles}>
+            <h2 style={{ fontSize: isPreview ? '0.4rem' : '1.25rem', fontWeight: 'bold', marginBottom: isPreview ? '0.1rem' : '0.5rem', textAlign: 'center' }}>
+              {page.title}
+            </h2>
+            <p style={{ fontSize: isPreview ? '0.25rem' : '0.9rem', textAlign: 'center' }}>
+              {page.content?.slice(0, 100) || 'Content preview...'}
+            </p>
+          </div>
+        );
+    }
+  };
 
   return (
     <div className="h-screen bg-background text-foreground flex flex-col dark overflow-hidden">
@@ -1076,7 +1860,14 @@ export default function Home() {
                       className={`page-card ${showThemeSettings ? 'p-2' : 'p-6'} cursor-pointer ${
                         selectedPage === page.id ? "selected" : ""
                       } transition-all duration-300`}
-                      onClick={() => scrollToPage(page.id)}
+                      onClick={() => {
+                        if (expandedPageForTemplates === page.id) {
+                          setExpandedPageForTemplates(null);
+                        } else {
+                          scrollToPage(page.id);
+                          setExpandedPageForTemplates(page.id);
+                        }
+                      }}
                     >
                       {showThemeSettings ? (
                         // Collapsed view - just page number
@@ -1277,6 +2068,7 @@ export default function Home() {
                       </div>
                       )}
                     </Card>
+
                   </motion.div>
                 ))}
               </AnimatePresence>
@@ -1299,301 +2091,269 @@ export default function Home() {
         {/* Right Panel - Professional Preview */}
         <motion.div
           ref={rightPanelRef}
-          className="border-r border-border p-6 overflow-y-auto bg-background flex-shrink-0 h-full"
+          className={`border-r border-border p-6 overflow-y-auto bg-background h-full ${
+            showThemeSettings ? 'flex-shrink-0' : 'flex-1'
+          }`}
           style={{ scrollBehavior: 'smooth' }}
           animate={{
-            width: showThemeSettings ? 'calc(100vw - 120px - 480px - 4px)' : rightPanelWidth,
+            width: showThemeSettings ? 'calc(100vw - 120px - 480px - 4px)' : 'auto',
             opacity: showThemeSettings ? 1 : 1
           }}
           transition={{ type: "spring", damping: 30, stiffness: 300, duration: 0.4 }}
         >
-          <div className={`${gridLayout === 'double' ? 'grid grid-cols-2 gap-4' : 'space-y-4'}`}>
-            {pages.map((page) => (
-              <motion.div
-                key={page.id}
-                data-preview-id={page.id}
-                className={`professional-preview cursor-pointer ${
-                  selectedPage === page.id ? "selected" : ""
-                }`}
-                onClick={() => {
-                  if (showTemplatePanel && selectedPageForTemplate === page.id) {
-                    setShowTemplatePanel(false);
-                    setSelectedPageForTemplate(null);
-                  } else {
-                    scrollToPage(page.id);
-                    setSelectedPageForTemplate(page.id);
-                    setShowTemplatePanel(true);
-                  }
-                }}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                layout
-              >
-                <div
-                  className={`preview-container text-black ${gridLayout === 'double' ? 'p-6 pt-10' : 'p-8 pt-12'} rounded-lg shadow-lg aspect-[3/4] relative overflow-hidden`}
-                  style={{
-                    background: page.template === 'title' ? currentTheme.coverBackground.value : currentTheme.colors.background,
-                    fontFamily: currentTheme.typography.bodyFont,
-                    color: page.template === 'title' ? '#ffffff' : 'inherit'
-                  }}
-                >
-                  {page.template === 'title' && (
-                    <div className="h-full flex flex-col justify-center items-center text-center px-4">
-                      <h1
-                        className={`${gridLayout === 'double' ? 'text-lg' : 'text-3xl'} font-bold mb-4 leading-tight drop-shadow-lg`}
-                        style={{
-                          fontSize: gridLayout === 'double' ? '1.1rem' : currentTheme.typography.h1Size,
-                          fontFamily: currentTheme.typography.headingFont,
-                          color: '#ffffff',
-                          textShadow: '0 2px 4px rgba(0,0,0,0.5)'
-                        }}
-                      >
-                        {page.title}
-                      </h1>
-                      {page.subtitle && (
-                        <p
-                          className={`${gridLayout === 'double' ? 'text-xs' : 'text-lg'} mb-6 drop-shadow-md`}
-                          style={{
-                            fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
-                            color: '#f0f0f0',
-                            textShadow: '0 1px 2px rgba(0,0,0,0.5)'
-                          }}
-                        >
-                          {page.subtitle}
-                        </p>
-                      )}
-                      <div
-                        className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} max-w-md leading-relaxed drop-shadow-md`}
-                        style={{
-                          fontSize: gridLayout === 'double' ? '0.7rem' : currentTheme.typography.bodySize,
-                          color: '#e0e0e0',
-                          textShadow: '0 1px 2px rgba(0,0,0,0.5)'
-                        }}
-                      >
-                        {page.content}
-                      </div>
-                    </div>
-                  )}
+          <div className="space-y-4">
+            {gridLayout === 'double' ? (
+              // Double column layout with proper row handling
+              pages.reduce((rows: ContentPage[][], page, index) => {
+                const rowIndex = Math.floor(index / 2);
+                const positionInRow = index % 2;
 
-                  {page.template === 'text-image-right' && (
-                    <div className={`h-full flex ${gridLayout === 'double' ? 'gap-2' : 'gap-6'} px-2`}>
-                      <div className="flex-1 flex flex-col">
-                        <h2
-                          className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-3`}
-                          style={{
-                            fontSize: gridLayout === 'double' ? '0.875rem' : currentTheme.typography.h2Size,
-                            fontFamily: currentTheme.typography.headingFont,
-                            color: currentTheme.colors.primary
+                if (!rows[rowIndex]) {
+                  rows[rowIndex] = [];
+                }
+                rows[rowIndex][positionInRow] = page;
+                return rows;
+              }, []).map((row: ContentPage[], rowIndex: number) => (
+                <div key={`row-${rowIndex}`} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    {row.map((page) => (
+                      page && (
+                        <motion.div
+                          key={page.id}
+                          data-preview-id={page.id}
+                          className={`professional-preview cursor-pointer relative group ${
+                            selectedPage === page.id ? "selected" : ""
+                          }`}
+                          onClick={() => {
+                            scrollToPage(page.id);
+                            // Toggle template expansion
+                            setExpandedPageForTemplates(
+                              expandedPageForTemplates === page.id ? null : page.id
+                            );
                           }}
-                        >
-                          {page.title}
-                        </h2>
-                        <p
-                          className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed`}
-                          style={{
-                            fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
-                            fontFamily: currentTheme.typography.bodyFont,
-                            color: currentTheme.colors.text
+                          whileHover={{ scale: expandedPageForTemplates === page.id ? 0.95 : 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          layout
+                          animate={{
+                            scale: expandedPageForTemplates === page.id ? 0.85 : 1,
                           }}
+                          transition={{ type: "spring", damping: 30, stiffness: 300 }}
                         >
-                          {page.content}
-                        </p>
-                      </div>
-                      {page.images.length > 0 && (
-                        <div className="w-1/2">
-                          <img
-                            src={page.images[0]}
-                            alt={page.title}
-                            className={`w-full ${gridLayout === 'double' ? 'h-20' : 'h-48'} object-cover rounded-lg`}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {page.template === 'text-image-left' && (
-                    <div className={`h-full flex ${gridLayout === 'double' ? 'gap-2' : 'gap-6'} px-2`}>
-                      {page.images.length > 0 && (
-                        <div className="w-1/2">
-                          <img
-                            src={page.images[0]}
-                            alt={page.title}
-                            className={`w-full ${gridLayout === 'double' ? 'h-20' : 'h-48'} object-cover rounded-lg`}
-                          />
-                        </div>
-                      )}
-                      <div className="flex-1 flex flex-col">
-                        <h2
-                          className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-3`}
-                          style={{
-                            fontSize: gridLayout === 'double' ? '0.875rem' : currentTheme.typography.h2Size,
-                            fontFamily: currentTheme.typography.headingFont,
-                            color: currentTheme.colors.primary
-                          }}
-                        >
-                          {page.title}
-                        </h2>
-                        <p
-                          className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed`}
-                          style={{
-                            fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
-                            fontFamily: currentTheme.typography.bodyFont,
-                            color: currentTheme.colors.text
-                          }}
-                        >
-                          {page.content}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {page.template === 'image-top-text' && (
-                    <div className="h-full flex flex-col px-2">
-                      {page.images.length > 0 && (
-                        <div className={`${gridLayout === 'double' ? 'mb-2' : 'mb-6'}`}>
-                          {page.images.length === 1 ? (
-                            <img
-                              src={page.images[0]}
-                              alt={page.title}
-                              className={`w-full ${gridLayout === 'double' ? 'h-16' : 'h-40'} object-cover rounded-lg`}
-                            />
-                          ) : (
-                            <div className="grid grid-cols-2 gap-1">
-                              {page.images.slice(0, 4).map((img, idx) => (
-                                <img
-                                  key={idx}
-                                  src={img}
-                                  alt={`${page.title} ${idx + 1}`}
-                                  className={`w-full ${gridLayout === 'double' ? 'h-8' : 'h-20'} object-cover rounded-lg`}
-                                />
-                              ))}
+                          {/* Template Library Icon on Hover */}
+                          <div className="absolute top-3 left-3 z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                            <div className="bg-primary/90 backdrop-blur-sm text-white p-2 rounded-lg shadow-lg">
+                              <LayoutTemplate className="w-4 h-4" />
                             </div>
-                          )}
-                        </div>
-                      )}
-                      <h2
-                        className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-3`}
-                        style={{
-                          fontSize: gridLayout === 'double' ? '0.875rem' : currentTheme.typography.h2Size,
-                          fontFamily: currentTheme.typography.headingFont,
-                          color: currentTheme.colors.primary
-                        }}
-                      >
-                        {page.title}
-                      </h2>
-                      <p
-                        className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed flex-1`}
-                        style={{
-                          fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
-                          fontFamily: currentTheme.typography.bodyFont,
-                          color: currentTheme.colors.text
-                        }}
-                      >
-                        {page.content}
-                      </p>
-                    </div>
-                  )}
+                          </div>
 
-                  {page.template === 'text-top-image' && (
-                    <div className="h-full flex flex-col px-2">
-                      <h2
-                        className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-3`}
-                        style={{
-                          fontSize: gridLayout === 'double' ? '0.875rem' : currentTheme.typography.h2Size,
-                          fontFamily: currentTheme.typography.headingFont,
-                          color: currentTheme.colors.primary
-                        }}
-                      >
-                        {page.title}
-                      </h2>
-                      <p
-                        className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed mb-4`}
-                        style={{
-                          fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
-                          fontFamily: currentTheme.typography.bodyFont,
-                          color: currentTheme.colors.text
-                        }}
-                      >
-                        {page.content}
-                      </p>
-                      {page.images.length > 0 && (
-                        <div className="flex-1">
-                          <img
-                            src={page.images[0]}
-                            alt={page.title}
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
+                          <div
+                            className={`preview-container text-black ${gridLayout === 'double' ? 'p-6 pt-10' : 'p-8 pt-12'} rounded-lg shadow-lg aspect-[3/4] relative overflow-hidden`}
+                            style={{
+                              background: page.template === 'title' ? currentTheme.coverBackground.value : currentTheme.colors.background,
+                              fontFamily: currentTheme.typography.bodyFont,
+                              color: page.template === 'title' ? '#ffffff' : 'inherit'
+                            }}
+                          >
+                            {renderTemplateContent(page, page.template, currentTheme)}
 
-                  {page.template === 'text-only' && (
-                    <div className="h-full flex flex-col px-4">
-                      <h2
-                        className={`${gridLayout === 'double' ? 'text-sm' : 'text-2xl'} font-bold mb-4`}
-                        style={{
-                          fontSize: gridLayout === 'double' ? '0.875rem' : currentTheme.typography.h2Size,
-                          fontFamily: currentTheme.typography.headingFont,
-                          color: currentTheme.colors.primary
-                        }}
+                            <div className="absolute top-2 right-2">
+                              <div className={`page-number-preview ${gridLayout === 'double' ? 'text-xs w-5 h-5' : 'text-xs w-6 h-6'} bg-cyan-500 text-white rounded-full flex items-center justify-center font-semibold shadow-lg`}>
+                                {page.id}
+                              </div>
+                            </div>
+                          </div>
+
+                        </motion.div>
+                      )
+                    ))}
+                  </div>
+
+                  {/* Template Gallery Expansion - spans full width after this row */}
+                  <AnimatePresence>
+                    {row.some((page: ContentPage) => expandedPageForTemplates === page?.id) && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ type: "spring", damping: 30, stiffness: 300, duration: 0.4 }}
+                        className="overflow-hidden w-full"
                       >
-                        {page.title}
-                      </h2>
-                      <div
-                        className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed whitespace-pre-line`}
-                        style={{
-                          fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
-                          fontFamily: currentTheme.typography.bodyFont,
-                          color: currentTheme.colors.text
-                        }}
-                      >
-                        {page.content}
+                        <div className="p-6 bg-muted/30 border border-border rounded-lg relative">
+                          {/* Close Button */}
+                          <button
+                            onClick={() => setExpandedPageForTemplates(null)}
+                            className="absolute top-3 right-3 z-10 bg-background/80 backdrop-blur-sm hover:bg-background text-foreground p-1.5 rounded-lg shadow-lg transition-colors"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+
+                          <div className="relative">
+                            {/* Scroll Left Button */}
+                            <button
+                              onClick={() => {
+                                const container = document.querySelector('.template-gallery-container');
+                                if (container) {
+                                  container.scrollBy({ left: -200, behavior: 'smooth' });
+                                }
+                              }}
+                              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/90 backdrop-blur-sm hover:bg-background text-foreground p-2 rounded-lg shadow-lg transition-colors"
+                            >
+                              <ChevronLeft className="w-5 h-5" />
+                            </button>
+
+                            {/* Scroll Right Button */}
+                            <button
+                              onClick={() => {
+                                const container = document.querySelector('.template-gallery-container');
+                                if (container) {
+                                  container.scrollBy({ left: 200, behavior: 'smooth' });
+                                }
+                              }}
+                              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/90 backdrop-blur-sm hover:bg-background text-foreground p-2 rounded-lg shadow-lg transition-colors"
+                            >
+                              <ChevronRight className="w-5 h-5" />
+                            </button>
+
+
+                            {/* Horizontal Scrollable Gallery */}
+                            <div className="flex gap-6 overflow-x-auto px-12 py-2 template-gallery-container">
+                              {(() => {
+                                const currentPage = row.find((page: ContentPage) => expandedPageForTemplates === page?.id);
+                                const filteredTemplates = currentPage ? getFilteredTemplatesForPage(currentPage, templates) : templates;
+                                return filteredTemplates.map((template) => {
+                                const isSelected = currentPage?.template === template.value;
+                                return (
+                                  <motion.div
+                                    key={template.value}
+                                    onClick={() => {
+                                      if (currentPage) {
+                                        updatePage(currentPage.id, { template: template.value });
+                                      }
+                                    }}
+                                    className={`cursor-pointer p-2 rounded-lg border transition-all flex-shrink-0 ${
+                                      isSelected
+                                        ? 'border-primary bg-primary/10 shadow-md'
+                                        : 'border-border hover:border-primary/50 hover:shadow-sm'
+                                    }`}
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                  >
+                                    <div className="w-64 h-48 bg-white border border-border rounded overflow-hidden relative mb-2">
+                                      <div
+                                        className="h-full w-full"
+                                        style={{
+                                          background: template.value === 'title' ? currentTheme.coverBackground.value : currentTheme.colors.background,
+                                          fontFamily: currentTheme.typography.bodyFont,
+                                          fontSize: '0.3rem',
+                                          color: template.value === 'title' ? '#ffffff' : currentTheme.colors.text
+                                        }}
+                                      >
+                                        {currentPage && renderTemplateContent(currentPage, template.value, currentTheme, true)}
+                                      </div>
+                                    </div>
+                                  </motion.div>
+                                );
+                                });
+                              })()}
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              ))
+            ) : (
+              // Single column layout
+              pages.map((page) => (
+                <motion.div
+                  key={page.id}
+                  data-preview-id={page.id}
+                  className={`professional-preview cursor-pointer ${
+                    selectedPage === page.id ? "selected" : ""
+                  }`}
+                  onClick={() => {
+                    scrollToPage(page.id);
+                    setExpandedPageForTemplates(
+                      expandedPageForTemplates === page.id ? null : page.id
+                    );
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  layout
+                >
+                  <div
+                    className={`preview-container text-black p-8 pt-12 rounded-lg shadow-lg aspect-[3/4] relative overflow-hidden`}
+                    style={{
+                      background: page.template === 'title' ? currentTheme.coverBackground.value : currentTheme.colors.background,
+                      fontFamily: currentTheme.typography.bodyFont,
+                      color: page.template === 'title' ? '#ffffff' : 'inherit'
+                    }}
+                  >
+                    {renderTemplateContent(page, page.template, currentTheme)}
+
+                    <div className="absolute top-2 right-2">
+                      <div className="page-number-preview text-xs w-6 h-6 bg-cyan-500 text-white rounded-full flex items-center justify-center font-semibold shadow-lg">
+                        {page.id}
                       </div>
-                    </div>
-                  )}
-
-                  {page.template === 'table-of-contents' && (
-                    <div className="h-full px-4">
-                      <h2
-                        className={`${gridLayout === 'double' ? 'text-sm' : 'text-3xl'} font-bold mb-4 text-center`}
-                        style={{
-                          fontSize: gridLayout === 'double' ? '0.875rem' : currentTheme.typography.h1Size,
-                          fontFamily: currentTheme.typography.headingFont,
-                          color: currentTheme.colors.primary
-                        }}
-                      >
-                        {page.title}
-                      </h2>
-                      <div
-                        className={`${gridLayout === 'double' ? 'p-2' : 'p-6'} rounded-lg`}
-                        style={{
-                          backgroundColor: `${currentTheme.colors.accent}20`,
-                          border: `1px solid ${currentTheme.colors.accent}40`
-                        }}
-                      >
-                        <div
-                          className={`${gridLayout === 'double' ? 'text-xs' : 'text-base'} leading-relaxed whitespace-pre-line`}
-                          style={{
-                            fontSize: gridLayout === 'double' ? '0.75rem' : currentTheme.typography.bodySize,
-                            fontFamily: currentTheme.typography.bodyFont,
-                            color: currentTheme.colors.text
-                          }}
-                        >
-                          {page.content}
-                        </div>
-                      </div>
-                    </div>
-                  )}
-
-                  <div className="absolute top-2 right-2">
-                    <div className={`page-number-preview ${gridLayout === 'double' ? 'text-xs w-5 h-5' : 'text-xs w-6 h-6'} bg-cyan-500 text-white rounded-full flex items-center justify-center font-semibold shadow-lg`}>
-                      {page.id}
                     </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+
+                  {/* Template Gallery for single column */}
+                  <AnimatePresence>
+                    {expandedPageForTemplates === page.id && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ type: "spring", damping: 30, stiffness: 300, duration: 0.4 }}
+                        className="overflow-hidden mt-4"
+                      >
+                        <div className="p-4 bg-muted/30 border border-border rounded-lg">
+                          <h4 className="text-sm font-semibold mb-4 text-center">Choose Layout Template</h4>
+
+
+                          <div className="flex gap-6 overflow-x-auto pb-2 template-gallery-container">
+                            {getFilteredTemplatesForPage(page, templates).map((template) => {
+                              const isSelected = page.template === template.value;
+                              return (
+                                <motion.div
+                                  key={template.value}
+                                  onClick={() => {
+                                    updatePage(page.id, { template: template.value });
+                                  }}
+                                  className={`cursor-pointer p-2 rounded-lg border transition-all flex-shrink-0 ${
+                                    isSelected
+                                      ? 'border-primary bg-primary/10 shadow-md'
+                                      : 'border-border hover:border-primary/50 hover:shadow-sm'
+                                  }`}
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                >
+                                  <div className="w-64 h-48 bg-white border border-border rounded overflow-hidden relative mb-2">
+                                    <div
+                                      className="h-full w-full"
+                                      style={{
+                                        background: template.value === 'title' ? currentTheme.coverBackground.value : currentTheme.colors.background,
+                                        fontFamily: currentTheme.typography.bodyFont,
+                                        fontSize: '0.3rem',
+                                        color: template.value === 'title' ? '#ffffff' : currentTheme.colors.text
+                                      }}
+                                    >
+                                      {renderTemplateContent(page, template.value, currentTheme, true)}
+                                    </div>
+                                  </div>
+                                </motion.div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              ))
+            )}
           </div>
         </motion.div>
 
@@ -1601,14 +2361,6 @@ export default function Home() {
         <AnimatePresence>
           {showImageTray && (
             <>
-              {/* Overlay */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/50 z-40"
-                onClick={closeImageTray}
-              />
 
               {/* Slide-out Tray */}
               <motion.div
@@ -1862,12 +2614,38 @@ export default function Home() {
                             </button>
                           ))}
                         </div>
+
+                        {/* Gradient Filter */}
+                        <div>
+                          <label className="text-sm font-medium mb-2 block">Background Style</label>
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {['All', 'Solid Colors', 'Gradients'].map((filter) => (
+                              <button
+                                key={filter}
+                                onClick={() => setSelectedGradientFilter(filter)}
+                                className={`px-3 py-1 text-xs rounded-full transition-colors ${
+                                  selectedGradientFilter === filter
+                                    ? 'bg-accent text-accent-foreground'
+                                    : 'bg-muted/50 text-muted-foreground hover:bg-accent/20'
+                                }`}
+                              >
+                                {filter}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
                       </div>
 
                       {/* Theme Grid */}
                       <div className="space-y-3">
                         {predefinedThemes
                           .filter(theme => selectedCategory === 'All' || theme.category === selectedCategory)
+                          .filter(theme => {
+                            if (selectedGradientFilter === 'All') return true;
+                            if (selectedGradientFilter === 'Solid Colors') return theme.coverBackground.type === 'solid';
+                            if (selectedGradientFilter === 'Gradients') return theme.coverBackground.type === 'gradient';
+                            return true;
+                          })
                           .map((theme) => (
                             <motion.div
                               key={theme.name}
@@ -2051,7 +2829,7 @@ export default function Home() {
                                   key={type}
                                   onClick={() => setCurrentTheme(prev => ({
                                     ...prev,
-                                    coverBackground: { ...prev.coverBackground, type: type as any }
+                                    coverBackground: { ...prev.coverBackground, type: type as 'solid' | 'gradient' }
                                   }))}
                                   className={`p-2 text-sm rounded border ${
                                     currentTheme.coverBackground.type === type
@@ -2167,293 +2945,6 @@ export default function Home() {
                   </Button>
                 </div>
               </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Visual Template Customization Panel */}
-        <AnimatePresence>
-          {showTemplatePanel && selectedPageForTemplate && (
-            <motion.div
-              initial={{ y: '100%' }}
-              animate={{ y: '35%' }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="fixed bottom-0 right-0 h-[65%] bg-background border-t border-l border-border z-40 shadow-2xl"
-              style={{ width: rightPanelWidth }}
-            >
-              <div className="h-full flex flex-col">
-                {/* Header */}
-                <div className="p-4 border-b border-border flex-shrink-0">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">Choose Layout Template</h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setShowTemplatePanel(false);
-                        setSelectedPageForTemplate(null);
-                      }}
-                      className="h-8 w-8 p-0"
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-
-                {/* Template Gallery */}
-                <div className="flex-1 p-4">
-                  <div className="text-sm font-medium mb-4">Choose Layout Template</div>
-
-                  {/* Navigation and Gallery Container */}
-                  <div className="relative">
-                    {/* Left Arrow */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="absolute left-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 p-0 bg-background/80 backdrop-blur-sm"
-                      onClick={() => {
-                        const container = document.querySelector('.template-gallery-container') as HTMLElement;
-                        if (container) {
-                          const scrollAmount = 200;
-                          container.scrollLeft = Math.max(0, container.scrollLeft - scrollAmount);
-                          setTemplateGalleryScroll(container.scrollLeft - scrollAmount);
-                        }
-                      }}
-                      disabled={templateGalleryScroll <= 0}
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </Button>
-
-                    {/* Right Arrow */}
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-1/2 -translate-y-1/2 z-10 h-8 w-8 p-0 bg-background/80 backdrop-blur-sm"
-                      onClick={() => {
-                        const container = document.querySelector('.template-gallery-container') as HTMLElement;
-                        if (container) {
-                          const scrollAmount = 200;
-                          const maxScroll = container.scrollWidth - container.clientWidth;
-                          container.scrollLeft = Math.min(maxScroll, container.scrollLeft + scrollAmount);
-                          setTemplateGalleryScroll(container.scrollLeft + scrollAmount);
-                        }
-                      }}
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </Button>
-
-                    {/* Scrollable Template Gallery */}
-                    <motion.div
-                      className="template-gallery-container flex gap-4 overflow-x-auto scrollbar-hide py-2 px-8"
-                      onScroll={(e) => {
-                        const target = e.target as HTMLElement;
-                        setTemplateGalleryScroll(target.scrollLeft);
-                      }}
-                      style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2, duration: 0.5 }}
-                    >
-                    {templates.map((template, index) => {
-                      const currentPage = pages.find(p => p.id === selectedPageForTemplate);
-                      const isSelected = currentPage?.template === template.value;
-
-                      if (!currentPage) return null;
-
-                      return (
-                        <motion.div
-                          key={template.value}
-                          onClick={() => updatePage(currentPage.id, { template: template.value })}
-                          className="cursor-pointer flex-shrink-0"
-                          initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                          animate={{ opacity: 1, scale: 1, y: 0 }}
-                          transition={{
-                            delay: 0.3 + (index * 0.1),
-                            duration: 0.4,
-                            type: "spring",
-                            damping: 20,
-                            stiffness: 300
-                          }}
-                          whileHover={{ y: -5 }}
-                        >
-                          <motion.div
-                            className="w-56 h-48 bg-white border border-border rounded-lg overflow-hidden relative"
-                            whileHover={{
-                              scale: 1.05,
-                              borderColor: currentTheme.colors.primary,
-                              boxShadow: `0 8px 32px ${currentTheme.colors.primary}33`
-                            }}
-                            whileTap={{ scale: 0.98 }}
-                            transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                            animate={{
-                              borderColor: isSelected ? currentTheme.colors.primary : 'transparent'
-                            }}
-                          >
-                            <div
-                              className="h-full p-2 text-black"
-                              style={{
-                                background: template.value === 'title' ? currentTheme.coverBackground.value : currentTheme.colors.background,
-                                fontFamily: currentTheme.typography.bodyFont,
-                                fontSize: '0.5rem'
-                              }}
-                            >
-                              {/* Title Template */}
-                              {template.value === 'title' && (
-                                <div className="h-full flex flex-col justify-center items-center text-center">
-                                  <h1 style={{ fontSize: '0.6rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', marginBottom: '0.25rem' }}>
-                                    {currentPage.title}
-                                  </h1>
-                                  <div style={{ fontSize: '0.4rem', color: currentTheme.colors.text }}>
-                                    {currentPage.content.slice(0, 50)}...
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Text Image Right */}
-                              {template.value === 'text-image-right' && (
-                                <div className="h-full flex gap-1">
-                                  <div className="flex-1">
-                                    <h2 style={{ fontSize: '0.5rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', marginBottom: '0.2rem' }}>
-                                      {currentPage.title}
-                                    </h2>
-                                    <div style={{ fontSize: '0.35rem', color: currentTheme.colors.text, lineHeight: '1.2' }}>
-                                      {currentPage.content.slice(0, 60)}...
-                                    </div>
-                                  </div>
-                                  <div className="w-1/3">
-                                    {currentPage.images.length > 0 ? (
-                                      <img
-                                        src={currentPage.images[0]}
-                                        alt="preview"
-                                        className="w-full h-12 object-cover"
-                                        style={{ borderRadius: '2px' }}
-                                      />
-                                    ) : (
-                                      <div className="w-full h-12 bg-gray-200 rounded flex items-center justify-center">
-                                        <ImageIcon className="w-3 h-3 text-gray-400" />
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Text Image Left */}
-                              {template.value === 'text-image-left' && (
-                                <div className="h-full flex gap-1">
-                                  <div className="w-1/3">
-                                    {currentPage.images.length > 0 ? (
-                                      <img
-                                        src={currentPage.images[0]}
-                                        alt="preview"
-                                        className="w-full h-12 object-cover"
-                                        style={{ borderRadius: '2px' }}
-                                      />
-                                    ) : (
-                                      <div className="w-full h-12 bg-gray-200 rounded flex items-center justify-center">
-                                        <ImageIcon className="w-3 h-3 text-gray-400" />
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="flex-1">
-                                    <h2 style={{ fontSize: '0.5rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', marginBottom: '0.2rem' }}>
-                                      {currentPage.title}
-                                    </h2>
-                                    <div style={{ fontSize: '0.35rem', color: currentTheme.colors.text, lineHeight: '1.2' }}>
-                                      {currentPage.content.slice(0, 60)}...
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Image Top Text */}
-                              {template.value === 'image-top-text' && (
-                                <div className="h-full flex flex-col">
-                                  <div className="h-1/2 mb-1">
-                                    {currentPage.images.length > 0 ? (
-                                      <img
-                                        src={currentPage.images[0]}
-                                        alt="preview"
-                                        className="w-full h-full object-cover"
-                                        style={{ borderRadius: '2px' }}
-                                      />
-                                    ) : (
-                                      <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center">
-                                        <ImageIcon className="w-4 h-4 text-gray-400" />
-                                      </div>
-                                    )}
-                                  </div>
-                                  <div className="flex-1">
-                                    <h2 style={{ fontSize: '0.5rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', marginBottom: '0.2rem' }}>
-                                      {currentPage.title}
-                                    </h2>
-                                    <div style={{ fontSize: '0.35rem', color: currentTheme.colors.text, lineHeight: '1.2' }}>
-                                      {currentPage.content.slice(0, 40)}...
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Text Top Image */}
-                              {template.value === 'text-top-image' && (
-                                <div className="h-full flex flex-col">
-                                  <div className="flex-1 mb-1">
-                                    <h2 style={{ fontSize: '0.5rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', marginBottom: '0.2rem' }}>
-                                      {currentPage.title}
-                                    </h2>
-                                    <div style={{ fontSize: '0.35rem', color: currentTheme.colors.text, lineHeight: '1.2' }}>
-                                      {currentPage.content.slice(0, 40)}...
-                                    </div>
-                                  </div>
-                                  <div className="h-1/2">
-                                    {currentPage.images.length > 0 ? (
-                                      <img
-                                        src={currentPage.images[0]}
-                                        alt="preview"
-                                        className="w-full h-full object-cover"
-                                        style={{ borderRadius: '2px' }}
-                                      />
-                                    ) : (
-                                      <div className="w-full h-full bg-gray-200 rounded flex items-center justify-center">
-                                        <ImageIcon className="w-4 h-4 text-gray-400" />
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Text Only */}
-                              {template.value === 'text-only' && (
-                                <div className="h-full p-1">
-                                  <h2 style={{ fontSize: '0.5rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', marginBottom: '0.3rem' }}>
-                                    {currentPage.title}
-                                  </h2>
-                                  <div style={{ fontSize: '0.35rem', color: currentTheme.colors.text, lineHeight: '1.3' }}>
-                                    {currentPage.content.slice(0, 100)}...
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Table of Contents */}
-                              {template.value === 'table-of-contents' && (
-                                <div className="h-full p-1">
-                                  <h2 style={{ fontSize: '0.5rem', fontFamily: currentTheme.typography.headingFont, color: currentTheme.colors.primary, fontWeight: 'bold', textAlign: 'center', marginBottom: '0.3rem' }}>
-                                    {currentPage.title}
-                                  </h2>
-                                  <div className="bg-cyan-50 p-1 rounded" style={{ fontSize: '0.3rem', color: currentTheme.colors.text }}>
-                                    {currentPage.content.slice(0, 80)}...
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </motion.div>
-                        </motion.div>
-                      );
-                    })}
-                    </motion.div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
           )}
         </AnimatePresence>
       </div>
