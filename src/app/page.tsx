@@ -15,63 +15,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Template types for different page layouts
-type TemplateType = 'title' | 'text-image-right' | 'text-image-left' | 'image-top-text' | 'text-top-image' | 'text-only' | 'table-of-contents' | 'full-image' | 'image-grid-2' | 'image-grid-3' | 'image-grid-4' | 'image-grid-multi' | 'color-block-left' | 'color-block-top' | 'color-split' | 'accent-sidebar' | 'magazine-layout' | 'hero-banner' | 'timeline';
+// Import our refactored components
+import { TemplateType, ContentPage, GlobalTheme, ImageTrayTab } from '@/types';
+import { TemplateRenderer, TemplateGallery } from '@/components/templates';
+import { ImageLibrary } from '@/components/images';
+import { analyzePageContent, getFilteredTemplatesForPage } from '@/utils/templateUtils';
+import { addImageToPage, removeImageFromPage, createNewPage, duplicatePage, updatePageContent, deletePage } from '@/utils/pageUtils';
+import { TEMPLATES } from '@/utils/constants';
 
-// Global theme interface for premium styling
-interface GlobalTheme {
-  name: string;
-  category: string;
-  description: string;
-  typography: {
-    headingFont: string;
-    bodyFont: string;
-    h1Size: string;
-    h2Size: string;
-    bodySize: string;
-  };
-  colors: {
-    primary: string;
-    secondary: string;
-    text: string;
-    background: string;
-    accent: string;
-  };
-  coverBackground: {
-    type: 'solid' | 'gradient' | 'pattern';
-    value: string;
-    gradient?: {
-      from: string;
-      to: string;
-      direction: string;
-    };
-  };
-  banners: {
-    enabled: boolean;
-    color: string;
-    opacity: number;
-  };
-  imageStyle: {
-    borderRadius: string;
-    borderWidth: string;
-    borderColor: string;
-    shadow: string;
-    bordersEnabled: boolean;
-  };
-}
-
-// Page/Content block type definition
-interface ContentPage {
-  id: number;
-  title: string;
-  content: string;
-  images: string[];
-  template: TemplateType;
-  subtitle?: string;
-  isGenerating?: boolean;
-  showPrompt?: boolean;
-  promptText?: string;
-}
 
 export default function Home() {
   const [pages, setPages] = useState<ContentPage[]>([
